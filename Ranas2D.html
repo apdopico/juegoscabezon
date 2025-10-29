@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ranas 2D</title>
+<link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png" />
+<style>
+  /* ======== ESTILO GENERAL ======== */
+body {
+  background-color: #3d5c5c;
+  background-image: url("../Imagenes/imagenFondo.png");
+  margin: 0;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.contenedor-juego {
+  margin: 40px auto;
+}
+
+/* ======== TABLEROS ======== */
+.tablero {
+  display: grid;
+  justify-content: center;
+  margin: 20px auto;
+  gap: 2px; /* espacio entre celdas */
+}
+
+/* Tablero específico según tamaño */
+.tablero-5 {
+  grid-template-columns: repeat(5, 70px);
+  grid-template-rows: repeat(5, 70px);
+}
+
+.tablero-7 {
+  grid-template-columns: repeat(7, 70px);
+  grid-template-rows: repeat(7, 70px);
+}
+
+/* ======== CELDAS ======== */
+.celda {
+  width: 70px;
+  height: 70px;
+  background-color: #fff;
+  border: 1px solid #bbb;   /* borde sutil */
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 4px;       /* opcional: esquinas suaves */
+}
+
+.celda img {
+  width: 60px;
+  height: auto;
+}
+
+/* Imagen de victoria */
+img.victoria {
+  width: 50px;
+  height: 51px;
+}
+
+/* ======== BOTONES ======== */
+.botones-globales {
+  margin: 10px auto 20px;
+  max-width: 200px;
+  display: flex;
+  justify-content: center;
+  padding: 0 10px;
+}
+
+.btn-atras {
+  background-image: url('Imagenes/ranas.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 113px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 1px 1px 2px black;
+  border-radius: 0;
+}
+
+/* ======== AJUSTES TABLET (≤768px) ======== */
+@media (max-width: 768px) {
+  .tablero-5 {
+    grid-template-columns: repeat(5, 56px);
+    grid-template-rows: repeat(5, 56px);
+  }
+
+  .tablero-7 {
+    grid-template-columns: repeat(7, 52px);
+    grid-template-rows: repeat(7, 52px);
+  }
+
+  .celda {
+    width: 56px;
+    height: 56px;
+  }
+
+  .celda img {
+    width: 46px;
+  }
+
+  img.victoria {
+    width: 38px;
+    height: 39px;
+  }
+
+  .btn-atras {
+    width: 90px;
+    height: 36px;
+    font-size: 13px;
+  }
+}
+
+/* ======== AJUSTES MÓVILES (≤480px) ======== */
+@media (max-width: 480px) {
+  .tablero-5 {
+    grid-template-columns: repeat(5, 44px);
+    grid-template-rows: repeat(5, 44px);
+  }
+
+  .tablero-7 {
+    grid-template-columns: repeat(7, 42px);
+    grid-template-rows: repeat(7, 42px);
+  }
+
+  .celda {
+    width: 42px;
+    height: 42px;
+    border: 1px solid #aaa; /* más fino en móviles */
+  }
+
+  .celda img {
+    width: 38px;
+  }
+
+  img.victoria {
+    width: 30px;
+    height: 31px;
+  }
+
+  .botones-globales {
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 12px auto;
+  }
+
+  .btn-atras {
+    width: 85px;
+    height: 33px;
+    font-size: 12px;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="contenedor-juego">
+  <div id="tablero5" class="tablero tablero-5"></div>
+  <div class="botones-globales">
+    <button id="btn-deshacer5" class="btn-atras">Paso <br> atrás</button>
+  </div>
+</div>
+
+<div class="contenedor-juego">
+  <div id="tablero7" class="tablero tablero-7"></div>
+  <div class="botones-globales">
+    <button id="btn-deshacer7" class="btn-atras">Paso <br> Atrás</button>
+  </div>
+</div>
+
+<script>
+/* ========= LÓGICA DEL TABLERO 5x5 ========= */
+let estado5 = [
+  ['marron','marron','marron','marron','marron'],
+  ['marron','marron','marron','marron','marron'],
+  ['marron','marron', null, 'verde','verde'],
+  ['verde','verde','verde','verde','verde'],
+  ['verde','verde','verde','verde','verde']
+];
+const historial5 = [];
+
+function renderTablero5() {
+  const div = document.getElementById('tablero5');
+  div.innerHTML = '';
+  for (let f=0; f<5; f++) {
+    for (let c=0; c<5; c++) {
+      const valor = estado5[f][c];
+      const celda = document.createElement('div');
+      celda.className = 'celda';
+      if (valor==='marron') {
+        celda.innerHTML = "<img src='Imagenes/ranaM.png'>";
+      } else if (valor==='verde') {
+        celda.innerHTML = "<img src='Imagenes/ranaV.png'>";
+      } else if (valor==='ganador') {
+        celda.innerHTML = "<img src='Imagenes/ranasB.png' class='victoria'>";
+      }
+      celda.addEventListener('click', ()=>moverRana5(f,c));
+      div.appendChild(celda);
+    }
+  }
+}
+
+function moverRana5(f,c) {
+  const rana = estado5[f][c];
+  if (!rana) return;
+  const movs=[];
+  if (rana==='marron') {
+    if (f+1<5 && !estado5[f+1][c]) movs.push([f+1,c]);
+    if (c+1<5 && !estado5[f][c+1]) movs.push([f,c+1]);
+    if (f+2<5 && !estado5[f+2][c] && estado5[f+1][c]) movs.push([f+2,c]);
+    if (c+2<5 && !estado5[f][c+2] && estado5[f][c+1]) movs.push([f,c+2]);
+  } else {
+    if (f-1>=0 && !estado5[f-1][c]) movs.push([f-1,c]);
+    if (c-1>=0 && !estado5[f][c-1]) movs.push([f,c-1]);
+    if (f-2>=0 && !estado5[f-2][c] && estado5[f-1][c]) movs.push([f-2,c]);
+    if (c-2>=0 && !estado5[f][c-2] && estado5[f][c-1]) movs.push([f,c-2]);
+  }
+  if (movs.length>0) {
+    historial5.push(JSON.parse(JSON.stringify(estado5)));
+    const [nf,nc]=movs[0];
+    estado5[nf][nc]=rana; estado5[f][c]=null;
+    renderTablero5(); verificarGanador5();
+  }
+}
+
+function verificarGanador5() {
+  const meta=[
+    ['verde','verde','verde','verde','verde'],
+    ['verde','verde','verde','verde','verde'],
+    ['verde','verde', null,'marron','marron'],
+    ['marron','marron','marron','marron','marron'],
+    ['marron','marron','marron','marron','marron']
+  ];
+  if (JSON.stringify(estado5)===JSON.stringify(meta)) {
+    estado5[2][2]='ganador'; renderTablero5();
+  }
+}
+document.getElementById('btn-deshacer5').addEventListener('click',()=>{
+  if (historial5.length>0) { estado5=historial5.pop(); renderTablero5(); }
+});
+renderTablero5();
+
+/* ========= LÓGICA DEL TABLERO 7x7 ========= */
+let estado7 = [
+  ['marron','marron','marron','marron','marron','marron','marron'],
+  ['marron','marron','marron','marron','marron','marron','marron'],
+  ['marron','marron','marron','marron','marron','marron','marron'],
+  ['marron','marron','marron', null,'verde','verde','verde'],
+  ['verde','verde','verde','verde','verde','verde','verde'],
+  ['verde','verde','verde','verde','verde','verde','verde'],
+  ['verde','verde','verde','verde','verde','verde','verde']
+];
+const historial7 = [];
+
+function renderTablero7() {
+  const div = document.getElementById('tablero7');
+  div.innerHTML = '';
+  for (let f=0; f<7; f++) {
+    for (let c=0; c<7; c++) {
+      const valor = estado7[f][c];
+      const celda = document.createElement('div');
+      celda.className = 'celda';
+      if (valor==='marron') {
+        celda.innerHTML = "<img src='Imagenes/ranaM.png'>";
+      } else if (valor==='verde') {
+        celda.innerHTML = "<img src='Imagenes/ranaV.png'>";
+      } else if (valor==='ganador') {
+        celda.innerHTML = "<img src='Imagenes/ranasB.png' class='victoria'>";
+      }
+      celda.addEventListener('click', ()=>moverRana7(f,c));
+      div.appendChild(celda);
+    }
+  }
+}
+
+function moverRana7(f,c) {
+  const rana = estado7[f][c];
+  if (!rana) return;
+  const movs=[];
+  if (rana==='marron') {
+    if (f+1<7 && !estado7[f+1][c]) movs.push([f+1,c]);
+    if (c+1<7 && !estado7[f][c+1]) movs.push([f,c+1]);
+    if (f+2<7 && !estado7[f+2][c] && estado7[f+1][c]) movs.push([f+2,c]);
+    if (c+2<7 && !estado7[f][c+2] && estado7[f][c+1]) movs.push([f,c+2]);
+  } else {
+    if (f-1>=0 && !estado7[f-1][c]) movs.push([f-1,c]);
+    if (c-1>=0 && !estado7[f][c-1]) movs.push([f,c-1]);
+    if (f-2>=0 && !estado7[f-2][c] && estado7[f-1][c]) movs.push([f-2,c]);
+    if (c-2>=0 && !estado7[f][c-2] && estado7[f][c-1]) movs.push([f,c-2]);
+  }
+  if (movs.length>0) {
+    historial7.push(JSON.parse(JSON.stringify(estado7)));
+    const [nf,nc]=movs[0];
+    estado7[nf][nc]=rana; estado7[f][c]=null;
+    renderTablero7(); verificarGanador7();
+  }
+}
+
+function verificarGanador7() {
+  const meta=[
+    ['verde','verde','verde','verde','verde','verde','verde'],
+    ['verde','verde','verde','verde','verde','verde','verde'],
+    ['verde','verde','verde','verde','verde','verde','verde'],
+    ['verde','verde','verde', null,'marron','marron','marron'],
+    ['marron','marron','marron','marron','marron','marron','marron'],
+    ['marron','marron','marron','marron','marron','marron','marron'],
+    ['marron','marron','marron','marron','marron','marron','marron']
+  ];
+  if (JSON.stringify(estado7)===JSON.stringify(meta)) {
+    estado7[3][3]='ganador'; renderTablero7();
+  }
+}
+document.getElementById('btn-deshacer7').addEventListener('click',()=>{
+  if (historial7.length>0) { estado7=historial7.pop(); renderTablero7(); }
+});
+renderTablero7();
+</script>
+</body>
+</html>

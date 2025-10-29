@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Juego del OSO</title>
+  <style>
+body {
+  background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+  font-family: sans-serif;
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* 🔹 Tablero responsive */
+.board {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 0;
+  margin: 0 auto;
+  background-color: antiquewhite;
+  width: 90vw;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+}
+
+/* 🔹 Celdas flexibles */
+.cell {
+  width: 100%;
+  height: 100%;
+  font-size: 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #444;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cell.filled {
+  cursor: default;
+}
+
+.cell.highlight {
+  background-color: rgb(150, 228, 5);
+  color: white;
+}
+
+/* 🔹 Marcador */
+.score {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+/* 🔹 Versión escritorio */
+@media (min-width: 600px) {
+  .board {
+    width: fit-content;
+    aspect-ratio: auto;
+    grid-template-columns: repeat(7, 60px);
+    grid-template-rows: repeat(7, 60px);
+  }
+
+  .cell {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="board" id="board"></div>
+  <div class="score">
+    Turno de: <span id="turn">Jugador</span><br />
+    Letra actual: <strong id="selectedLetter">O</strong><br />
+    Puntuación - Jugador: <span id="score1">0</span> | IA: <span id="score2">0</span>
+  </div>
+
+  <script>
+    const size = 7;
+    const board = document.getElementById('board');
+    const turnDisplay = document.getElementById('turn');
+    const selectedLetterDisplay = document.getElementById('selectedLetter');
+    const score1Display = document.getElementById('score1');
+    const score2Display = document.getElementById('score2');
+
+    // tablero: matriz [row][col], '' = vacío, 'O' o 'S'
+    let grid = Array.from({length: size}, () => Array(size).fill(''));
+    let currentPlayer = 1; // 1 = humano, 2 = IA
+    let scores = [0, 0];   // [jugador, ia]
+    let turnCount = 0;
+    let highlights = [];
+
+    function getLetterForTurn(tc = turnCount) {
+      // Alterna O y S cada dos turnos: 0,1 = O; 2,3 = S; ...
+      return Math.floor(tc / 2) % 2 === 0 ? 'O' : 'S';
+    }
+
+    function createBoard() {
+      board.innerHTML = '';
+      selectedLetterDisplay.textContent = getLetterForTurn();
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.textContent = grid[row][col];
+          if (grid[row][col]) {
+            cell.classList.add('filled');
+          } else if (currentPlayer === 1) {
+            // usar onclick para reemplazar posible listener anterior
+            cell.onclick = handleClick;
+          } else {
+            cell.onclick = null;
+          }
+          if (highlights.some(h => h[0] === row && h[1] === col)) {
+            cell.classList.add('highlight');
+          }
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function handleClick(e) {
+      if (currentPlayer !== 1) return;
+      const row = +e.currentTarget.dataset.row;
+      const col = +e.currentTarget.dataset.col;
+      if (grid[row][col]) return;
+
+      const letter = getLetterForTurn();
+      grid[row][col] = letter;
+
+      highlights = getOSOCoords(grid, row, col);
+      const points = highlights.length / 3;
+      scores[0] += points;
+      updateScore();
+
+      createBoard();
+
+      if (points > 0) {
+        setTimeout(() => {
+          highlights = [];
+          createBoard();
+          if (isGameOver()) {
+            showWinner();
+            return;
+          }
+        }, 1000);
+      } else {
+        turnCount++;
+        currentPlayer = 2;
+        turnDisplay.textContent = 'IA';
+        setTimeout(() => {
+          highlights = [];
+          createBoard();
+          if (isGameOver()) {
+            showWinner();
+            return;
+          }
+          aiMove();
+        }, 300);
+      }
+    }
+
+    // --- IA ---
+    function aiMove() {
+      const letter = getLetterForTurn();
+      let bestMove = null;
+      let maxScore = -Infinity;
+
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (!grid[row][col]) {
+            // trabajar con copia para evaluar sin mutar el tablero real
+            const testGrid = cloneGrid(grid);
+            testGrid[row][col] = letter;
+
+            let offensive = countOSO(testGrid, row, col);          // puntos inmediatos
+            let defensive = evaluatePlayerThreatsFrom(testGrid);   // amenaza del jugador
+            let isolation = countAdjacentLettersOn(testGrid, row, col);
+            let risk = simulatePlayerOSOAfterMoveOn(testGrid, row, col);
+            let trap = simulateTrapOn(testGrid, row, col);
+
+            // Pesos: puedes ajustarlos
+            let score = offensive * 1000
+                      - defensive * 500
+                      - isolation * 50
+                      - risk * 1000
+                      + trap * 800;
+
+            if (score > maxScore) {
+              maxScore = score;
+              bestMove = { row, col };
+            }
+          }
+        }
+      }
+
+      if (!bestMove) {
+        if (isGameOver()) showWinner();
+        return;
+      }
+
+      // ejecutar mejor jugada en tablero real
+      const { row, col } = bestMove;
+      const playLetter = getLetterForTurn();
+      grid[row][col] = playLetter;
+      highlights = getOSOCoords(grid, row, col);
+      const points = highlights.length / 3;
+      scores[1] += points;
+      updateScore();
+      createBoard();
+
+      if (points > 0) {
+        setTimeout(() => {
+          highlights = [];
+          createBoard();
+          if (isGameOver()) {
+            showWinner();
+            return;
+          }
+          // IA sigue jugando si consigue puntos
+          aiMove();
+        }, 1000);
+      } else {
+        turnCount++;
+        currentPlayer = 1;
+        turnDisplay.textContent = 'Jugador';
+        highlights = [];
+        createBoard();
+        if (isGameOver()) showWinner();
+      }
+    }
+
+    // --- utilidades de simulación sin efectos secundarios ---
+    function cloneGrid(g) {
+      return g.map(row => row.slice());
+    }
+
+    // Cuenta cuántos OSO genera colocar en (row,col) sobre una grid dada
+    function countOSO(g, row, col) {
+      return getOSOCoords(g, row, col).length / 3;
+    }
+
+    function getOSOCoords(g, row, col) {
+      const dirs = [
+        [0, 1], [1, 0], [1, 1], [1, -1]
+      ];
+      let found = [];
+      for (const [dx, dy] of dirs) {
+        for (let offset = -2; offset <= 0; offset++) {
+          const r1 = row + offset * dx;
+          const c1 = col + offset * dy;
+          const r2 = r1 + dx;
+          const c2 = c1 + dy;
+          const r3 = r2 + dx;
+          const c3 = c2 + dy;
+
+          if (isInBounds(r1, c1) && isInBounds(r2, c2) && isInBounds(r3, c3)) {
+            const seq = (g[r1][c1] || '') + (g[r2][c2] || '') + (g[r3][c3] || '');
+            if (seq === 'OSO') {
+              found.push([r1, c1], [r2, c2], [r3, c3]);
+            }
+          }
+        }
+      }
+      return found;
+    }
+
+    function isInBounds(r, c) {
+      return r >= 0 && r < size && c >= 0 && c < size;
+    }
+
+    function countAdjacentLettersOn(g, row, col) {
+      let count = 0;
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          if (dx === 0 && dy === 0) continue;
+          const r = row + dx;
+          const c = col + dy;
+          if (isInBounds(r, c) && g[r][c]) count++;
+        }
+      }
+      return count;
+    }
+
+    // Evalúa cuántos OSO podría conseguir el jugador si jugara con su próxima letra (sobre una grid dada)
+    function evaluatePlayerThreatsFrom(g) {
+      const nextLetter = getLetterForTurn() === 'O' ? 'S' : 'O';
+      let total = 0;
+      const tg = cloneGrid(g);
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (!tg[row][col]) {
+            tg[row][col] = nextLetter;
+            total += countOSO(tg, row, col);
+            tg[row][col] = '';
+          }
+        }
+      }
+      return total;
+    }
+
+    // Simula que la IA juega en (rAI,cAI) (en la grid dada) y cuenta cuántos OSO podría crear después el jugador (riesgo)
+    function simulatePlayerOSOAfterMoveOn(g, rAI, cAI) {
+      const aiLetter = getLetterForTurn();
+      const tg = cloneGrid(g);
+      tg[rAI][cAI] = aiLetter;
+      const nextLetter = aiLetter === 'O' ? 'S' : 'O';
+      let totalThreat = 0;
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (!tg[row][col]) {
+            tg[row][col] = nextLetter;
+            totalThreat += countOSO(tg, row, col);
+            tg[row][col] = '';
+          }
+        }
+      }
+      return totalThreat;
+    }
+
+    // Nuevo: simula trampas que obliguen al jugador a crear OSO para la IA (sobre una grid dada)
+    function simulateTrapOn(g, rAI, cAI) {
+      const aiLetter = getLetterForTurn();
+      const tg = cloneGrid(g);
+      tg[rAI][cAI] = aiLetter;
+      const nextLetter = aiLetter === 'O' ? 'S' : 'O';
+      let forcedOSO = 0;
+
+      // Si al jugador no le quedaran movimientos "seguros" y algunos movimientos le generan OSO,
+      // eso es una trampa. Aquí sumamos los OSO que el jugador podría crear (lo usamos como premio).
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (!tg[row][col]) {
+            tg[row][col] = nextLetter;
+            let puntosJugador = countOSO(tg, row, col);
+            if (puntosJugador > 0) {
+              forcedOSO += puntosJugador;
+            }
+            tg[row][col] = '';
+          }
+        }
+      }
+
+      return forcedOSO;
+    }
+
+    // --- funciones auxiliares para el juego real ---
+    function updateScore() {
+      // mostrar sin decimales si son enteros, o con 1 decimal si necesario
+      score1Display.textContent = Number.isInteger(scores[0]) ? scores[0] : scores[0].toFixed(1);
+      score2Display.textContent = Number.isInteger(scores[1]) ? scores[1] : scores[1].toFixed(1);
+    }
+
+    function isGameOver() {
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (!grid[row][col]) return false;
+        }
+      }
+      return true;
+    }
+
+    function showWinner() {
+      const message =
+        scores[0] > scores[1]
+          ? '¡Ganaste! 🎉'
+          : scores[1] > scores[0]
+          ? 'Ganó la IA 🤖'
+          : 'Empate 🤝';
+      setTimeout(() => alert(message), 300);
+    }
+
+    // iniciar tablero
+    createBoard();
+  </script>
+</body>
+</html>

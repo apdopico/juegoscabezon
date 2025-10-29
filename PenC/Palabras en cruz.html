@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Palabras en cruz</title>
+<meta name="language" content="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<link rel="icon" type="image/png" href="../Imagenes/faviconCabeza.png"/>
+<style>
+ body {
+  text-align: center;
+  background-color:  #3d5c5c;background-image: url("../../Imagenes/imagenFondo.png");
+  font-family: Verdana, sans-serif;
+  font-size: 1.5em;
+  padding: 1em;
+}
+
+h1 {
+  margin-bottom: 1em;
+  font-size: 1.65em;
+}
+
+.contenedor-scroll {
+  overflow-x: auto;
+  padding: 1em;
+  background-color: white;
+  border-radius: 10px;
+  display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.grid-10 {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr); /* Máx 8 columnas en escritorio */
+  gap: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.grid-10 a {
+  display: block;
+  padding: 0.5em;
+  border: 1px solid #000;
+  background-color: #f0f0f0;
+  color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.grid-10 a:hover {
+  background-color: #ddd;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 1.125em;
+    padding: 0.75em;
+  }
+
+  h1 {
+    font-size: 1.5em;
+    margin-bottom: 0.85em;
+  }
+
+  .grid-10 {
+    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); 
+    /* Auto-ajusta columnas sin que se ensanche solo una */
+    max-width: calc(35px * 10); /* No más de 10 columnas */
+    margin: 0 auto; /* Centrar si hay espacio */
+  }
+
+  .grid-10 a {
+    padding: 0.375em;
+    font-size: 0.9em;
+  }
+
+}
+
+</style>
+</head>
+<body>
+  <h1>PALABRAS EN CRUZ</h1>
+
+  <div class="contenedor-scroll">
+    <div class="grid-10">
+      <a href="PenC1.html" target="_blank">1</a>
+      <a href="PenC2.html" target="_blank">2</a>
+      <a href="PenC3.html" target="_blank">3</a>
+      <a href="PenC4.html" target="_blank">4</a>
+      <a href="PenC5.html" target="_blank">5</a>
+      <a href="PenC6.html" target="_blank">6</a>
+      <a href="PenC7.html" target="_blank">7</a>
+      <a href="PenC8.html" target="_blank">8</a>
+      <a href="PenC9.html" target="_blank">9</a>
+      <a href="PenC10.html" target="_blank">10</a>
+      <a href="PenC11.html" target="_blank">11</a>
+      <a href="PenC12.html" target="_blank">12</a>
+      <a href="PenC13.html" target="_blank">13</a>
+      <a href="PenC14.html" target="_blank">14</a>
+      
+    </div>
+  </div>
+  </body>
+</html>

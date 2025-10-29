@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Teléfonos</title>
+<meta name="language" content="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+<style>
+  body {
+  margin-top: 2em;
+  background-color: #3d5c5c;
+  background-image: url("../Imagenes/imagenFondo.png"), url("Imagenes/movil.png");
+  background-repeat: repeat, no-repeat;      /* la textura se repite, el móvil no */
+  background-size: auto, auto;              /* la textura en tamaño real, el móvil sin escalar */
+  background-position: center, center 2em;  /* textura centrada, móvil centrado y bajado 2em */
+  font-family: "Verdana", sans-serif;
+  text-align: center;
+  }
+  table{margin-top:7em;margin-left:auto;margin-right:auto;width:17em;height:30em;}
+  caption{height:2em;font-size:2.5em;}
+  td{padding-top:0.5em;}
+  #botones{margin-top:2em;}
+  button{width:1.5em;background-color:white;border-radius:50%;font-size:3em;cursor:pointer;}
+  #bien{visibility:hidden;}
+  #mal{visibility:hidden;}
+  @media only screen and (max-width:768px){body{zoom:90%;}}
+</style>
+</head>
+<body>
+  <table>
+    <caption id="texto"></caption>
+    <tr><td><button id="1">1</button></td><td><button id="2">2</button></td><td><button id="3">3</button></td></tr>
+    <tr><td><button id="4">4</button></td><td><button id="5">5</button></td><td><button id="6">6</button></td></tr>
+    <tr><td><button id="7">7</button></td><td><button id="8">8</button></td><td><button id="9">9</button></td></tr>
+    <tr><td></td><td><button id="0">0</button></td><td></td></tr>
+    <tr id="botones"><td><img id="bien" src="Imagenes/bienVerde.png"/></td><td><img src="Imagenes/llamar.png" onclick="jugar()"/></td><td><img id="mal" src="Imagenes/malAspa.png"/></td></tr>
+  </table>  
+</body>
+<script> 
+  function jugar(){
+  document.getElementById("texto").innerHTML="";
+  bien.style.visibility="hidden";
+  mal.style.visibility="hidden";
+  const pref=[600, 609, 610, 619, 620, 629, 630, 639, 640, 649, 650, 659, 660, 669, 670, 679, 945, 845, 967, 867, 965, 966, 865, 984, 985, 884, 920, 820, 924, 824, 947, 847, 927, 827, 956, 856, 942, 842, 964, 864, 926, 826, 957, 857, 981, 881, 969, 869, 972, 872, 958, 858, 949, 849, 943, 843, 959, 859, 974, 874, 971, 871, 953, 853, 987, 887, 973, 873, 982, 882, 951, 952, 851, 968, 868, 948, 848, 988, 888, 976, 879, 928, 828, 986, 886, 941, 841, 923, 823, 921, 821, 954, 955, 854, 975, 875, 977, 877, 922, 822, 978, 878, 925, 825, 960, 961, 962, 963, 860, 983, 863, 944, 946, 846, 980, 880, 976, 876];
+  var prefijo=pref[Math.floor(Math.random()*117)]
+  var c1="0123456789".charAt(Math.floor(Math.random()*10)); 
+  var c2="0123456789".charAt(Math.floor(Math.random()*10));
+  var c3="0123456789".charAt(Math.floor(Math.random()*10));
+  var c4="0123456789".charAt(Math.floor(Math.random()*10));
+  var c5="0123456789".charAt(Math.floor(Math.random()*10));
+  var c6="0123456789".charAt(Math.floor(Math.random()*10));
+  var num=prefijo+c1+c2+c3+c4+c5+c6;
+  document.getElementById("texto").innerHTML=num;
+  function borrar(){document.getElementById("texto").innerHTML="";}
+  setTimeout(borrar,9000);
+  var llamar="";
+  var lon=0;
+  for (let i = 0; i <= 9; i++) {
+  document.getElementById(i.toString()).addEventListener("click", function() {
+    if (lon < 9) {
+      llamar += i.toString();
+      lon++;
+      escribir();
+    }
+  });
+}
+  function escribir(){
+    document.getElementById("texto").innerHTML=llamar;
+    if(lon==9){
+    if(num==llamar){bien.style.visibility="visible";} 
+    else{mal.style.visibility="visible";}
+  }}
+}
+</script>
+</html>

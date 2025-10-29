@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+ <title>Menos 7</title>
+ <meta name="language" content="es">
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+ <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+<style>
+  body{position:relative;margin:0 auto;width:22.15em; background-color:#3d5c5c;background-image: url("../Imagenes/imagenFondo.png");text-align:center;font-family: "Verdana",Sanserif;}
+  div{background-color:rgb(233,233,219);padding-bottom:0.5em;}
+  #tabla1{margin:0 auto;margin-top:1em;margin-bottom:1em;}
+  #tabla1 td{width:2em;height:1.25em;border:1px solid #000;border-radius:12.5%;font-size:1.3em;}
+  #tabla2{margin:0 auto;margin-top:1em;width: 100%;border-collapse:collapse;background-image:linear-gradient(45deg,#ff944d,#ff6600);}
+  #tabla2 td{border:1px solid #000;padding:0.2em;font-size:1.5em;}
+  #tabla2 td:nth-child(1) {width: 30%;}
+  #tabla2 td:nth-child(2) {width: 35%;}
+  #tabla2 td:nth-child(3) {width: 35%;}
+  input{background-color:transparent;text-transform:uppercase;text-align:center;font-size:1em;border:0;outline:0 none;width:3ch;}
+  .error {color: red;}
+  .key-row {
+      display: none;
+    }
+    
+    @media (max-width: 1024px) {
+     
+     #teclado {
+      width: 100%;
+     }
+      .key-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.2em;
+    }
+
+    .key-button {
+      width: 1.5em;
+      height: 1.5em;
+      padding: 0;
+      margin: 0.15em;
+      background-color: #e0e0e0;
+      border: 1px solid black;
+      border-radius: 6px;
+      box-shadow:
+      4px 4px 0 rgba(0, 0, 0, 0.6),   /* Sombra a la derecha y abajo */
+        inset 0 1px 0 #fff, /* Iluminación interior superior */
+        inset 0 -1px 2px #bbb; /* Sombra interior inferior */
+      font-size: 1.5em;
+      color: #333;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease-in-out;
+    }
+
+    .key-button:active {
+      box-shadow:
+        1px 1px 0 #999,
+        inset 0 2px 4px #aaa;
+      transform: translate(2px, 2px);
+    }
+ }
+/* Solo tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  body {
+    width: 95%; /* Más ancho que el fijo en em */
+    font-size: 1.2em; /* Texto base más grande */
+  }
+
+  #tabla1 td {
+    width: 3em;       /* celdas más grandes */
+    height: 2em;
+    font-size: 1.6em; /* texto dentro más grande */
+  }
+
+  #tabla2 td {
+    font-size: 1.8em;
+    padding: 0.4em;
+  }
+
+  input {
+    font-size: 1.4em; /* inputs más grandes */
+    width: 4ch;
+  }
+}
+    
+</style>
+</head>
+<body>
+    <div>
+    <table id="tabla2">
+  <tr>
+    <td id="tiempo">00:00</td>
+    <td>Menos 7</td>
+    <td id="mejor">
+      <img src="Imagenes/corona.png" style="width:30px; height:auto; position:relative; top:4px;">
+      <span id="mejorTiempoTexto">00:00</span>
+    </td>
+  </tr>
+</table>  
+   <table id="tabla1">
+     <tr><td id="final"></td><td><input type="text" id="1"></td><td><input type="text" id="2"></td><td><input type="text" id="3"></td><td><input type="text" id="4"></td><td><input type="text" id="5"></td><td><input type="text" id="6"></td></tr>
+     <tr><td><input type="text" id="23"></td><td><input type="text" id="24"></td><td><input type="text" id="25"></td><td><input type="text" id="26"></td><td><input type="text" id="27"></td><td><input type="text" id="28"></td><td><input type="text" id="7"></td></tr>
+     <tr><td><input type="text" id="22"></td><td><input type="text" id="39"></td><td><input type="text" id="40"></td><td><input type="text" id="41"></td><td><input type="text" id="42"></td><td><input type="text" id="29"></td><td><input type="text" id="8"></td></tr>
+     <tr><td><input type="text" id="21"></td><td><input type="text" id="38"></td><td><input type="text" id="47"></td><td  id="inicio"></td><td><input type="text" id="43"></td><td><input type="text" id="30"></td><td><input type="text" id="9"></td></tr>
+     <tr><td><input type="text" id="20"></td><td><input type="text" id="37"></td><td><input type="text" id="46"></td><td><input type="text" id="45"></td><td><input type="text" id="44"></td><td><input type="text" id="31"></td><td><input type="text" id="10"></td></tr>
+     <tr><td><input type="text" id="19"></td><td><input type="text" id="36"></td><td><input type="text" id="35"></td><td><input type="text" id="34"></td><td><input type="text" id="33"></td><td><input type="text" id="32"></td><td><input type="text" id="11"></td></tr>
+     <tr><td><input type="text" id="18"></td><td><input type="text" id="17"></td><td><input type="text" id="16"></td><td><input type="text" id="15"></td><td><input type="text" id="14"></td><td><input type="text" id="13"></td><td><input type="text" id="12"></td></tr>
+    </table>
+
+    <img src="Imagenes/jugar4.png" onclick="jugar()" style="width:45px; height:auto;margin-bottom: 1em;">
+    
+    <div id="teclado">
+    <div class="key-row">
+    <button class="key-button" onclick="agregarNumero('7')">7</button>
+    <button class="key-button" onclick="agregarNumero('8')">8</button>
+    <button class="key-button" onclick="agregarNumero('9')">9</button>
+    <button class="key-button" onclick="confirmarNumero()">?</button>
+    </div>
+    <div class="key-row">
+    <button class="key-button" onclick="agregarNumero('4')">4</button>
+    <button class="key-button" onclick="agregarNumero('5')">5</button>
+    <button class="key-button" onclick="agregarNumero('6')">6</button>
+    <button class="key-button" onclick="borrarUltimo()">⌫</button>
+    </div>
+    <div class="key-row">
+    <button class="key-button" onclick="agregarNumero('1')">1</button>
+    <button class="key-button" onclick="agregarNumero('2')">2</button>
+    <button class="key-button" onclick="agregarNumero('3')">3</button>
+    <button class="key-button" onclick="agregarNumero('0')">0</button>
+    </div>
+  </div>
+</body>
+<script>
+    var r;
+    var i;
+    var segundos = 0;
+    var cronometro;
+    var tiempo = 0;
+    var inputActivo = null; // REGISTRO GLOBAL DEL INPUT ACTIVO
+
+    var vRecord = localStorage.getItem("mejorTiempo");
+    vRecord = vRecord ? parseInt(vRecord, 10) : 9999;
+
+    document.addEventListener("DOMContentLoaded", function () {
+    if (vRecord !== 9999) {
+        document.getElementById("mejorTiempoTexto").innerText = formatoTiempo(vRecord);
+    }
+
+    const inputs = document.querySelectorAll("#tabla1 input");
+    const isSmallScreen = window.innerWidth <= 1024;
+
+    inputs.forEach(input => {
+        // Registrar el input activo al hacer foco o clic
+        input.addEventListener("focus", () => {
+            inputActivo = input;
+        });
+
+        if (isSmallScreen) {
+            input.setAttribute("readonly", true);
+            // Permitir foco para guardar inputActivo
+            input.addEventListener("click", () => {
+                input.focus(); // No hagas blur
+            });
+        } else {
+            input.removeAttribute("readonly");
+        }
+    });
+});
+
+    function jugar() {
+        segundos = 0;
+        clearInterval(cronometro);
+        actualizarCronometro();
+
+        cronometro = setInterval(() => {
+            segundos++;
+            actualizarCronometro();
+        }, 1000);
+
+        const tabla = document.getElementById("tabla1");
+        tabla.style.backgroundImage = "none";
+
+        const inputs = tabla.getElementsByTagName("input");
+        for (let input of inputs) {
+            input.value = "";
+            input.disabled = false;
+        }
+
+        var r1 = Math.floor(Math.random() * 6) + 1;
+        var rFinal = 336 + r1;
+        r = rFinal;
+        i = 47;
+
+        document.getElementById("inicio").innerHTML = rFinal;
+        document.getElementById("final").innerHTML = r1;
+        document.getElementById("47").focus();
+    }
+
+    document.addEventListener("keyup", function (event) {
+        if (event.key === "Enter" && i <= 47) {
+            var currentInput = document.getElementById(i.toString());
+            var rI = parseInt(currentInput.value, 10);
+
+            if (!isNaN(rI) && rI === r - 7) {
+                r = rI;
+                i--;
+
+                if (i >= 1) {
+                    document.getElementById(i.toString()).focus();
+                } else {
+                    tiempo = segundos;
+                    if (tiempo < vRecord) {
+                        vRecord = tiempo;
+                        localStorage.setItem("mejorTiempo", vRecord);
+                        document.getElementById("mejor").innerText = formatoTiempo(vRecord);
+                    }
+
+                    clearInterval(cronometro);
+                    const tabla = document.getElementById("tabla1");
+                    tabla.style.backgroundImage = "url('Imagenes/medalla.png')";
+                    tabla.style.backgroundRepeat = "no-repeat";
+                    tabla.style.backgroundPosition = "center";
+                    document.activeElement.blur();
+                }
+            } else {
+                currentInput.classList.add('error');
+                setTimeout(() => {
+                    currentInput.classList.remove('error');
+                    currentInput.value = "";
+                }, 500);
+            }
+        }
+    });
+
+    function actualizarCronometro() {
+        document.getElementById("tiempo").innerText = formatoTiempo(segundos);
+    }
+
+    function formatoTiempo(seg) {
+        let minutos = Math.floor(seg / 60).toString().padStart(2, "0");
+        let segundos = (seg % 60).toString().padStart(2, "0");
+        return `${minutos}:${segundos}`;
+    }
+
+    function agregarNumero(numero) {
+        if (inputActivo && inputActivo.tagName === "INPUT") {
+            inputActivo.value += numero;
+            inputActivo.focus();
+        }
+    }
+
+    function confirmarNumero() {
+        if (inputActivo && inputActivo.tagName === "INPUT") {
+            const event = new KeyboardEvent("keyup", { key: "Enter" });
+            document.dispatchEvent(event);
+        }
+    }
+
+    function borrarUltimo() {
+        if (inputActivo && inputActivo.tagName === "INPUT" && inputActivo.value.length > 0) {
+            inputActivo.value = inputActivo.value.slice(0, -1);
+            inputActivo.focus();
+        }
+    }
+</script>
+
+</html>

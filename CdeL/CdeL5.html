@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Cruz de letras 5</title>
+        <meta name="language" content="es">
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <style>
+    body{position:relative;margin:auto;top:2em;background-color:#3d5c5c;background-image: url("../Imagenes/imagenFondo.png");}
+    table{margin:auto;border-collapse:collapse;text-align:center;background-color:rgb(233,233,219);border:2px solid #000;}
+    td{border:1px solid #000;width:1.5em;height:1.5em;padding: 0;}
+    #contenedor{display: flex;align-items: flex-end;justify-content: center;gap:25px;margin-top: 2em;}
+    #letras{margin: 0 2px;background-color:rgb(233,233,219);}
+    #letras td{border:none;}
+    #izquierda, #derecha{display:flex;gap:10px;}
+    img{cursor:pointer;width:40px;}
+    input:focus{outline:none;}
+    input {width: 100%;height: 100%;font-family:"Times New Roman",serif;font-size:1.4em;line-height:1.5em;text-align:center;vertical-align: middle;width:1.5em;height:1.5em;border:none;background-color:transparent;box-sizing:border-box;}
+    #E4{font-family:"Times New Roman",serif;font-size:1.4em;text-align:center;} 
+    #D3,#B5,#D5{background-color:black;}
+  </style>
+  </head>
+  <body>
+    <table id="cruz">
+      <tr>
+        <td style="border:none"><input type="button" id="A1"></td>
+        <td style="border:none"><input type="button" id="B1"></td>
+        <td style="border:none"><input type="button" id="C1"></td>
+        <td style="border:none"><input type="button" id="D1"></td>
+        <td style="border:none"><input type="button" id="E1"></td>
+        <td style="border:none"><input type="button" id="F1"></td>
+        <td><input type="button" id="G1" onclick="escribir()"></td>
+      </tr>
+      <tr>
+        <td style="border:none"><input type="button" id="A2"></td>
+        <td style="border:none"><input type="button" id="B2"></td>
+        <td><input type="button" id="C2" onclick="escribir()"></td>
+        <td><input type="button" id="D2" onclick="escribir()"></td>
+        <td><input type="button" id="E2" onclick="escribir()"></td>
+        <td><input type="button" id="F2" onclick="escribir()"></td>
+        <td><input type="button" id="G2" onclick="escribir()"></td>
+      </tr>
+      <tr>
+        <td><input type="button" id="A3" onclick="escribir()"></td>
+        <td style="border: none"><input type="button" id="B3"></td>
+        <td><input type="button" id="C3" onclick="escribir()"></td>
+        <td id="D3"></td>
+        <td><input type="button" id="E3" onclick="escribir()"></td>
+        <td style="border: none"><input type="button" id="F3"></td>
+        <td><input type="button" id="G3" onclick="escribir()"></td>
+      </tr>
+      <tr>
+        <td><input type="button" id="A4" onclick="escribir()"></td>
+        <td><input type="button" id="B4" onclick="escribir()"></td>
+        <td><input type="button" id="C4" onclick="escribir()"></td>
+        <td><input type="button" id="D4" onclick="escribir()"></td>
+        <td id="E4">D</td>
+        <td style="border: none"><input type="button" id="F4"></td>
+        <td><input type="button" id="G4" onclick="escribir()"></td>
+      </tr>
+      <tr>
+        <td><input type="button" id="A5" onclick="escribir()"></td>
+        <td id="B5"></td>
+        <td><input type="button" id="C5" onclick="escribir()"></td>
+        <td id="D5"></td>
+        <td><input type="button" id="E5" onclick="escribir()"></td>
+        <td style="border: none"><input type="button" id="F5"></td>
+        <td><input type="button" id="G5" onclick="escribir()"></td>
+      </tr>
+      <tr>
+        <td><input type="button" id="A6" onclick="escribir()"></td>
+        <td><input type="button" id="B6" onclick="escribir()"></td>
+        <td><input type="button" id="C6" onclick="escribir()"></td>
+        <td><input type="button" id="D6" onclick="escribir()"></td>
+        <td><input type="button" id="E6" onclick="escribir()"></td>
+        <td style="border: none"><input type="button" id="F6"></td>
+        <td style="border: none"><input type="button" id="G6"></td>
+      </tr>
+      <tr>
+        <td><input type="button" id="A7" onclick="escribir()"></td>
+        <td style="border:none"><input type="button" id="B7"></td>
+        <td style="border:none"><input type="button" id="C7"></td>
+        <td style="border:none"><input type="button" id="D7"></td>
+        <td style="border:none"><input type="button" id="E7"></td>
+        <td style="border:none"><input type="button" id="F7"></td>
+        <td style="border:none"><input type="button" id="G7"></td>
+      </tr>
+    </table>
+    <div id="contenedor">
+     <div id="izquierda"><img src="../Imagenes/comprobar4.png" onclick="comprobar()"/></div>
+     <table id="letras">
+      <tr>
+        <td><input type="button" value="N" onclick="seleccionar()"></td>
+        <td></td>
+        <td><input type="button" value="O" onclick="seleccionar()"></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><input type="button" value="A" onclick="seleccionar()"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><input type="button" value="R" onclick="seleccionar()"></td>
+        <td></td>
+        <td><input type="button" value="D" onclick="seleccionar()"></td>
+      </tr>
+   </table>
+   <div id="derecha"><img src="../Imagenes/goma.png" onclick="borrarLetra()"/></div>
+  </div>
+  </body>
+ <script>
+  var letra ;
+    function seleccionar(){letra = document.activeElement.value;}
+    function escribir(){document.activeElement.value=letra; document.activeElement.style.color="black";}
+    function borrarLetra(){letra = ""; document.activeElement.value=letra}
+    function comprobar(){
+    const respuestasCorrectas = {
+      "A3": "R", "A4": "O", "A5": "N", "A6": "D", "A7": "A",
+      "C2": "D", "C3": "O", "C4": "N", "C5": "A", "C6": "R",
+      "E2": "R", "E3": "A", "E5": "O", "E6": "N",
+      "G1": "N", "G2": "A", "G3": "R", "G4": "D", "G5": "O",
+      "B4": "R", "B6": "O", "D2": "O", "D4": "A", "D6": "A", "F2": "N", "G1": "N"
+    };
+
+    for (let id in respuestasCorrectas) {
+    let celda = document.getElementById(id);
+    if (celda.value !== respuestasCorrectas[id]) {
+      celda.style.color = "red";
+    } else {
+      celda.style.color = "black";
+    }
+    }
+    if (verificarCompletado(respuestasCorrectas)) {
+     mostrarCopa();
+  }
+}
+function verificarCompletado(respuestas) {
+  for (let id in respuestas) {
+    let celda = document.getElementById(id);
+    if (celda.value !== respuestas[id]) {
+      return false;
+    }
+  }
+  return true;
+}
+function mostrarCopa() {
+    let tabla = document.getElementById("cruz");
+    tabla.style.backgroundImage = "url('../Imagenes/copa.png')";
+    tabla.style.backgroundRepeat = "no-repeat";
+    tabla.style.backgroundPosition = "center";
+  }
+</script>
+</html>

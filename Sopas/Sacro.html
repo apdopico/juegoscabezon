@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<title>Sacro</title>
+<meta name="language" content="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+<style>
+  body { 
+    font-family: sans-serif; 
+    background-color:#3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+  #container { 
+    position: relative; 
+    display: inline-block; 
+    margin-bottom: 15px;
+    background-color: bisque;
+  }
+  #grid {
+    display: grid;
+    justify-content: center;
+  }
+  .cell {
+    width: 35px; height: 35px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; user-select: none;
+    cursor: pointer;
+  }
+  canvas {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+  }
+  button { 
+    padding: 8px 16px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    border: none; 
+    border-radius: 6px;
+    background: hwb(24 39% 2%); 
+    color: white;
+    margin: 5px;
+  }
+  button:hover { background: hwb(24 39% 2%);}
+  p{font-size: 20px;}
+  .highlight {
+    background-color: hwb(24 39% 2%); /* fondo tipo botón */
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;       
+    margin: 10px 5px;           
+    font-weight: normal;
+  }
+#checkImage {
+    display: none;           /* Oculta al inicio */
+    position: absolute;       /* Para poder posicionarla dentro de #container */
+    top: 50%;                 /* Centrado vertical */
+    left: 50%;                /* Centrado horizontal */
+    transform: translate(-50%, -50%); /* Ajusta el centro exacto */
+    pointer-events: none;     /* Permite interactuar con la sopa debajo */
+}
+@media (max-width: 480px) {
+  p {
+    font-size: 15px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .highlight {
+    font-size: 17px;
+    margin-top: 4px;
+    margin-bottom: 15px;
+  }
+  .cell {
+    width: 7vw;
+    aspect-ratio: 1 / 1;
+    font-size: 4.5vw;
+  }
+
+  #grid {
+    grid-template-columns: repeat(11, 7vw);
+  }
+}
+</style>
+</head>
+<body>
+<p>Encuentra las seis palabras que se  pueden <br> formar cambiando de posición las letras de</p>
+<p><span class="highlight">SACRO</span></p>
+
+<div id="container">
+  <div id="grid"></div>
+  <canvas id="foundCanvas"></canvas>
+  <canvas id="previewCanvas"></canvas>
+  <img id="checkImage" src="Imagenes/verificado.png">
+</div>
+
+<div>
+  <button id="showSolution">Ver solución</button>
+</div>
+
+<script>
+const letters = [
+"NMZCAROSLYR",
+"CBZORCASIRR",
+"NOVZARCOSOI",
+"KORCRASOSWY",
+"ZOFAILRCMHM",
+"AETOSCAWRGH",
+"SCORAUWOOFG",
+"ARASROCCULN",
+"OUJQVASGHWF",
+"RIDISAVQYBW",
+"CBQERRMDPNV "
+].map(r=>r.split(""));
+
+const words = ["corsa","rosca","rocas","rasco","craso","orcas","arcos","caros","sacro","coras","croas"];
+
+const rows = letters.length;
+const cols = letters[0].length;
+
+const grid = document.getElementById('grid');
+grid.style.gridTemplateColumns = `repeat(${cols}, 35px)`;
+
+const cells = [];
+for (let r = 0; r < rows; r++) {
+  cells[r] = [];
+  for (let c = 0; c < cols; c++) {
+    const d = document.createElement('div');
+    d.textContent = letters[r][c];
+    d.className = 'cell';
+    d.dataset.row = r;
+    d.dataset.col = c;
+    grid.appendChild(d);
+    cells[r][c] = d;
+  }
+}
+
+const wordState = {};
+words.forEach(w => wordState[w] = false);
+
+// Canvases
+const foundCanvas = document.getElementById('foundCanvas');
+const previewCanvas = document.getElementById('previewCanvas');
+const foundCtx = foundCanvas.getContext('2d');
+const previewCtx = previewCanvas.getContext('2d');
+
+foundCanvas.width = previewCanvas.width = grid.offsetWidth;
+foundCanvas.height = previewCanvas.height = grid.offsetHeight;
+
+function cellCenter(r, c) {
+  const cell = cells[r][c];
+  const rect = cell.getBoundingClientRect();
+  const gridRect = grid.getBoundingClientRect();
+  return {
+    x: rect.left - gridRect.left + rect.width / 2,
+    y: rect.top - gridRect.top + rect.height / 2
+  };
+}
+
+function drawLine(ctx, start, end, color, alpha) {
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = 25;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  ctx.lineTo(end.x, end.y);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function getPath(r1, c1, r2, c2) {
+  const dr = Math.sign(r2 - r1);
+  const dc = Math.sign(c2 - c1);
+  const len = Math.max(Math.abs(r2 - r1), Math.abs(c2 - c1)) + 1;
+  if (Math.abs(r2 - r1) !== 0 && Math.abs(c2 - c1) !== 0 && Math.abs(r2 - r1) !== Math.abs(c2 - c1)) return null;
+  const path = [];
+  for (let i = 0; i < len; i++) {
+    const rr = r1 + i * dr, cc = c1 + i * dc;
+    if (rr < 0 || rr >= rows || cc < 0 || cc >= cols) return null;
+    path.push({ r: rr, c: cc });
+  }
+  return path;
+}
+
+// Marcar palabra encontrada
+function markFound(w, path, color = "hwb(24 39% 2%)") {
+  wordState[w] = true;
+  const start = cellCenter(path[0].r, path[0].c);
+  const end = cellCenter(path[path.length - 1].r, path[path.length - 1].c);
+  drawLine(foundCtx, start, end, color, 0.5);
+  checkAllFound();
+}
+
+// Mostrar la imagen solo si todas las palabras están encontradas
+function checkAllFound() {
+  const allFound = Object.values(wordState).every(v => v);
+  const img = document.getElementById("checkImage");
+  img.style.display = allFound ? "block" : "none";
+}
+
+// Arrastre y selección
+let startCell = null;
+function getCellFromEvent(e) {
+  let clientX, clientY;
+  if (e.touches && e.touches[0]) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  const el = document.elementFromPoint(clientX, clientY);
+  if (el && el.classList.contains('cell')) return el;
+  return null;
+}
+
+// Eventos mouse
+grid.addEventListener('mousedown', e => { if (e.target.classList.contains('cell')) startCell = e.target; });
+grid.addEventListener('mousemove', e => {
+  if (!startCell) return;
+  const target = getCellFromEvent(e);
+  if (!target) return;
+  const r1 = parseInt(startCell.dataset.row), c1 = parseInt(startCell.dataset.col);
+  const r2 = parseInt(target.dataset.row), c2 = parseInt(target.dataset.col);
+  const path = getPath(r1, c1, r2, c2);
+  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+  if (path) {
+    drawLine(previewCtx, cellCenter(r1, c1), cellCenter(r2, c2), "gray", 0.3);
+  }
+});
+grid.addEventListener('mouseup', e => {
+  if (!startCell) return;
+  const target = getCellFromEvent(e);
+  if (!target) return;
+  const r1 = parseInt(startCell.dataset.row), c1 = parseInt(startCell.dataset.col);
+  const r2 = parseInt(target.dataset.row), c2 = parseInt(target.dataset.col);
+  const path = getPath(r1, c1, r2, c2);
+  if (path) processWord(path);
+  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+  startCell = null;
+});
+
+// Eventos touch
+grid.addEventListener('touchstart', e => { startCell = getCellFromEvent(e); e.preventDefault(); });
+grid.addEventListener('touchmove', e => {
+  if (!startCell) return;
+  const target = getCellFromEvent(e);
+  if (!target) return;
+  const r1 = parseInt(startCell.dataset.row), c1 = parseInt(startCell.dataset.col);
+  const r2 = parseInt(target.dataset.row), c2 = parseInt(target.dataset.col);
+  const path = getPath(r1, c1, r2, c2);
+  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+  if (path) drawLine(previewCtx, cellCenter(r1, c1), cellCenter(r2, c2), "gray", 0.3);
+  e.preventDefault();
+});
+grid.addEventListener('touchend', e => {
+  if (!startCell) return;
+  const target = getCellFromEvent(e.changedTouches[0] || e);
+  if (!target) return;
+  const r1 = parseInt(startCell.dataset.row), c1 = parseInt(startCell.dataset.col);
+  const r2 = parseInt(target.dataset.row), c2 = parseInt(target.dataset.col);
+  const path = getPath(r1, c1, r2, c2);
+  if (path) processWord(path);
+  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+  startCell = null;
+  e.preventDefault();
+});
+
+// Procesar palabra seleccionada
+function processWord(path) {
+  const word = path.map(p => cells[p.r][p.c].textContent.toLowerCase()).join('');
+  const rev = word.split('').reverse().join('');
+
+  // Si la palabra exacta está en la lista y no marcada → marcar
+  if (words.includes(word) && !wordState[word]) {
+    markFound(word, path);
+  }
+  // Si la inversa también está en la lista y no marcada → marcar
+  else if (words.includes(rev) && !wordState[rev]) {
+    markFound(rev, [...path].reverse());
+  }
+}
+
+// Botón ver solución (sin duplicados)
+document.getElementById("showSolution").addEventListener("click", () => {
+  const drawn = new Set(); // guarda las posiciones ya dibujadas
+
+  words.forEach(w => {
+    if (wordState[w]) return; // si ya está encontrada, saltar
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+
+            const path = getPath(r, c, r + dr * (w.length - 1), c + dc * (w.length - 1));
+            if (!path) continue;
+
+            const candidate = path.map(p => cells[p.r][p.c].textContent.toLowerCase()).join('');
+            const revCandidate = candidate.split('').reverse().join('');
+
+            if (candidate === w || revCandidate === w) {
+              // clave única con inicio y fin (independiente del sentido)
+              const key = `${path[0].r},${path[0].c}-${path[path.length - 1].r},${path[path.length - 1].c}`;
+              const keyRev = `${path[path.length - 1].r},${path[path.length - 1].c}-${path[0].r},${path[0].c}`;
+
+              if (!drawn.has(key) && !drawn.has(keyRev)) {
+                drawLine(
+                  foundCtx,
+                  cellCenter(path[0].r, path[0].c),
+                  cellCenter(path[path.length - 1].r, path[path.length - 1].c),
+                  "hwb(24 39% 2%)",
+                  0.5
+                );
+                drawn.add(key);
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+});
+
+
+</script>
+</body>
+</html>

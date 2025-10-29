@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cada oveja con su pareja</title>
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <style>
+  body {
+  margin: 2em;
+  text-align: center;
+  background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+  font-family: sans-serif;
+  overflow-x: hidden;
+}
+
+.contenedor-juego {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: hidden;
+  gap: 0.5em;
+  margin-bottom: 1em;
+  width: 100%;
+}
+
+.fila-sombras {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: hidden;
+  gap: 0.5em;
+  margin-bottom: 1em;
+  width: 100%;
+}
+
+.celda {
+  background-color: white;
+  border: 1px solid black;
+  width: 14vw;
+  height: 14vw;
+  max-width: 110px;
+  max-height: 110px;
+  min-width: 60px;
+  min-height: 60px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.celda img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.boton-jugar {
+  width: 71px;
+  height: 50px;
+  margin: 1em auto;
+  cursor: pointer;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .boton-jugar {
+    width: 60px;
+    height: 42px;
+  }
+}
+
+@media (max-width: 600px) {
+  .boton-jugar {
+    width: 50px;
+    height: 35px;
+  }
+}
+@media (max-width: 600px) {
+  .celda {
+    width: 18vw;
+    height: 18vw;
+  }
+}
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+}
+.contenedor-principal {
+  transform-origin: top center;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Escala al 75% en tablets */
+@media (max-width: 900px) {
+  .contenedor-principal {
+    transform: scale(0.75);
+  }
+}
+
+/* Escala al 50% en móviles */
+@media (max-width: 600px) {
+  .contenedor-principal {
+    zoom: scale(0.5);
+  }
+}
+
+</style>
+</head>
+<body>
+ <div class="wrapper">
+  <div class="contenedor-principal">
+  <div id="filaDados" class="contenedor-juego">
+    <div class="celda"><img src="Imagenes/unoP.png" alt="Dado 1"></div>
+    <div class="celda"><img src="Imagenes/dosP.png" alt="Dado 2"></div>
+    <div class="celda"><img src="Imagenes/tresP.png" alt="Dado 3"></div>
+    <div class="celda"><img src="Imagenes/cuatroP.png" alt="Dado 4"></div>
+    <div class="celda"><img src="Imagenes/cincoP.png" alt="Dado 5"></div>
+    <div class="celda"><img src="Imagenes/seisP.png" alt="Dado 6"></div>
+  </div>
+
+  <div id="filaSombras" class="contenedor-juego">
+    <div class="celda" onclick="seleccionarCelda(this)"></div>
+    <div class="celda" onclick="seleccionarCelda(this)"></div>
+    <div class="celda" onclick="seleccionarCelda(this)"></div>
+    <div class="celda" onclick="seleccionarCelda(this)"></div>
+    <div class="celda" onclick="seleccionarCelda(this)"></div>
+    <div class="celda" onclick="seleccionarCelda(this)"></div>
+  </div>
+
+  <img src="Imagenes/jugar3.png" class="boton-jugar" onclick="jugar()">
+
+  <div id="tablaSombras" class="contenedor-juego">
+    <div class="celda"><img src="Imagenes/burro100.png" onclick="seleccionarImagen(this)"></div>
+    <div class="celda"><img src="Imagenes/gato100.png" onclick="seleccionarImagen(this)"></div>
+    <div class="celda"><img src="Imagenes/perro100.png" onclick="seleccionarImagen(this)"></div>
+    <div class="celda"><img src="Imagenes/toro100.png" onclick="seleccionarImagen(this)"></div>
+    <div class="celda"><img src="Imagenes/elefante100.png" onclick="seleccionarImagen(this)"></div>
+    <div class="celda"><img src="Imagenes/caballo100.png" onclick="seleccionarImagen(this)"></div>
+  </div>
+ </div>
+ </div>
+  <script>
+    let imagenSeleccionada = null;
+    let referenciaOriginal = [];
+
+    function seleccionarImagen(img) {
+      imagenSeleccionada = img.cloneNode();
+    }
+
+    function seleccionarCelda(div) {
+      if (imagenSeleccionada && div.children.length === 0) {
+        div.appendChild(imagenSeleccionada);
+        imagenSeleccionada = null;
+
+        const celdas = Array.from(document.getElementById("filaSombras").children);
+        const completadas = celdas.every(celda => celda.children.length > 0);
+        if (completadas) {
+          verificarResultado();
+        }
+      }
+    }
+
+    function jugar() {
+      const filaDados = document.getElementById("filaDados").children;
+      const filaSombras = document.getElementById("filaSombras").children;
+
+      const sombras = Array.from(document.querySelectorAll("#tablaSombras img"));
+      const imagenesSombras = sombras.map(img => img.src);
+      const sombrasMezcladas = imagenesSombras.sort(() => Math.random() - 0.5);
+
+      referenciaOriginal = [];
+      for (let i = 0; i < filaDados.length; i++) {
+        referenciaOriginal.push({
+          dado: filaDados[i].querySelector("img").src,
+          sombra: sombrasMezcladas[i]
+        });
+        filaSombras[i].innerHTML = `<img src="${sombrasMezcladas[i]}" alt="Sombra">`;
+      }
+
+      setTimeout(() => {
+        for (let i = 0; i < filaSombras.length; i++) {
+          filaSombras[i].innerHTML = "";
+        }
+
+        const imagenesDados = Array.from(filaDados).map(cell => cell.querySelector("img").src);
+        const dadosMezclados = imagenesDados.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < filaDados.length; i++) {
+          filaDados[i].innerHTML = `<img src="${dadosMezclados[i]}" alt="Dado">`;
+        }
+      }, 4000);
+    }
+
+    function verificarResultado() {
+      const filaDados = document.getElementById("filaDados").children;
+      const filaSombras = document.getElementById("filaSombras").children;
+
+      for (let i = 0; i < 6; i++) {
+        const celda = filaSombras[i];
+        const sombraColocada = celda.querySelector("img")?.src;
+        const dadoActual = filaDados[i].querySelector("img").src;
+
+        celda.style.backgroundColor = "white";
+
+        const match = referenciaOriginal.find(par => par.dado === dadoActual);
+
+        if (match && match.sombra === sombraColocada) {
+          celda.style.backgroundColor = "green";
+        } else {
+          celda.style.backgroundColor = "red";
+        }
+      }
+
+      setTimeout(() => {
+        location.reload();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

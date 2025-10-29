@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="language" content="es">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrícula</title>
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png" />
+  <style>
+    body {
+      position: relative;
+      width: 30em;
+      margin: 0 auto;
+      background-color:#3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+      text-align: center;
+    }
+    table {
+      margin: auto;
+      font-family: "Verdana", Sans-serif;
+      text-align: center;
+      border-collapse: collapse;
+      border-spacing: 0;
+      width: 100%;
+    }
+    td {
+      padding: 0 0.3em;
+      vertical-align: middle;
+    }
+    tr {
+      margin: 0;
+      padding: 0;
+    }
+    .encabezado {
+      background-image: url('Imagenes/matriculaBlanco.png');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 4em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      width: 100%;
+    }
+    .botonM {
+      background-image: url('Imagenes/matriculaCelda.png');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      width: 100%;
+      padding: 0.2em 0.5em;
+      background-color: transparent;
+      border: none;
+      line-height: 1;
+      margin: 0;
+      height: 2em;
+    }
+    #controles {
+      padding: 2em;
+    }
+    #bien, #mal {
+      visibility: hidden;
+    }
+    @media screen and (max-width: 600px) {
+  body {
+    width: 25.5em; /* 80% de 30em */
+    margin: 2em auto 0 auto; /* margen superior aumentado a 2em */
+    font-size: 0.8em; /* 80% del tamaño original */
+  }
+
+  table {
+    width: 100%;
+  }
+
+  .encabezado {
+    height: 3.2em; /* 80% de 4em */
+    font-size: 2em;  /* 80% de 2.5em */
+  }
+
+  .botonM {
+    height: 1.6em; /* 80% de 2em */
+    font-size: 1.6em; /* 80% de 2em */
+    padding: 0.16em 0.4em;
+  }
+
+  #controles {
+    padding: 2.5em 0 0 0; /* más espacio arriba */
+  }
+
+  #bien, #mal, #controles img {
+    max-height: 2.25em; /* un poco más grande que antes */
+    width: auto;
+    
+  }
+}
+
+
+
+  </style>
+</head>
+<body>
+  <table>
+    <tr><td colspan="2"><div id="C0" class="encabezado">MATRÍCULA</div></td></tr>
+    <tr><td><input type="button" id="C1" class="botonM" onclick="probar(this)"></td><td><input type="button" id="C2" class="botonM" onclick="probar(this)"></td></tr>
+    <tr><td><input type="button" id="C3" class="botonM" onclick="probar(this)"></td><td><input type="button" id="C4" class="botonM" onclick="probar(this)"></td></tr>
+    <tr><td><input type="button" id="C5" class="botonM" onclick="probar(this)"></td><td><input type="button" id="C6" class="botonM" onclick="probar(this)"></td></tr>
+    <tr><td><input type="button" id="C7" class="botonM" onclick="probar(this)"></td><td><input type="button" id="C8" class="botonM" onclick="probar(this)"></td></tr>
+    <tr><td><input type="button" id="C9" class="botonM" onclick="probar(this)"></td><td><input type="button" id="C10" class="botonM" onclick="probar(this)"></td></tr>
+    <tr><td><input type="button" id="C11" class="botonM" onclick="probar(this)"></td><td><input type="button" id="C12" class="botonM" onclick="probar(this)"></td></tr>
+    <tr>
+      <td id="controles" colspan="2">
+        <img id="bien" src="Imagenes/bienPulgar.png" /> &nbsp; &nbsp; &nbsp; &nbsp;
+        <img src="Imagenes/jugar6.png" onclick="generarMatriculas();" /> &nbsp; &nbsp; &nbsp; &nbsp;
+        <img id="mal" src="Imagenes/malPulgar.png" />
+      </td>
+    </tr>
+  </table>
+
+  <script>
+    let M;
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function getPermutations(arr) {
+      if (arr.length === 1) return [arr];
+      let result = [];
+      for (let i = 0; i < arr.length; i++) {
+        const current = arr[i];
+        const remaining = arr.slice(0, i).concat(arr.slice(i + 1));
+        const innerPerms = getPermutations(remaining);
+        for (let perm of innerPerms) {
+          result.push([current].concat(perm));
+        }
+      }
+      return result;
+    }
+
+    function generarMatriculas() {
+      const bien = document.getElementById("bien");
+      const mal = document.getElementById("mal");
+      bien.style.visibility = "hidden";
+      mal.style.visibility = "hidden";
+
+      const numeros = "0123456789";
+      const letras = "BCDFGHJKLMNPRSTVWXYZ";
+
+      const n1 = numeros.charAt(Math.floor(Math.random() * numeros.length));
+      const n2 = numeros.charAt(Math.floor(Math.random() * numeros.length));
+      const n3 = numeros.charAt(Math.floor(Math.random() * numeros.length));
+      const n4 = numeros.charAt(Math.floor(Math.random() * numeros.length));
+      const l1 = letras.charAt(Math.floor(Math.random() * letras.length));
+      const l2 = letras.charAt(Math.floor(Math.random() * letras.length));
+      const l3 = letras.charAt(Math.floor(Math.random() * letras.length));
+
+      M = n1 + n2 + n3 + n4 + " " + l1 + l2 + l3;
+
+      const nArray = [n2, n3, n4];
+      const lArray = [l1, l2, l3];
+
+      const numberPerms = getPermutations(nArray);
+      const letterPerms = getPermutations(lArray);
+      const allCombos = [];
+
+      for (let np of numberPerms) {
+        for (let lp of letterPerms) {
+          const m = n1 + np.join("") + " " + lp.join("");
+          if (m !== M) allCombos.push(m);
+        }
+      }
+
+      const opcionesErroneas = shuffleArray(allCombos).slice(0, 11);
+      const opciones = [...opcionesErroneas];
+      const randomIndex = Math.floor(Math.random() * 12);
+      opciones.splice(randomIndex, 0, M);
+
+      const c0 = document.getElementById("C0");
+      c0.innerHTML = M;
+      c0.style.visibility = "visible";
+
+      setTimeout(() => {
+        c0.innerHTML = "";
+      }, 3000);
+
+      for (let i = 1; i <= 12; i++) {
+        const boton = document.getElementById("C" + i);
+        boton.value = opciones[i - 1];
+      }
+    }
+
+    function probar(button) {
+      const c0 = document.getElementById("C0");
+      const bien = document.getElementById("bien");
+      const mal = document.getElementById("mal");
+
+      c0.innerHTML = M;
+
+      if (button.value === M) {
+        bien.style.visibility = "visible";
+        mal.style.visibility = "hidden";
+      } else {
+        mal.style.visibility = "visible";
+        bien.style.visibility = "hidden";
+      }
+    }
+  </script>
+</body>
+</html>

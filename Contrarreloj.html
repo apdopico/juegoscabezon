@@ -1,0 +1,425 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Cálculo contrarreloj</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <style>
+ body {
+  margin: 0;
+  padding: 0;
+  background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+  font-family: "Verdana", sans-serif;
+  position: relative;
+}
+
+#contenedor {
+  position: relative;
+  top: 1.5em;
+  max-width: 30em;
+  margin: 0 auto;
+  border: 15px solid orange;
+  border-radius: 12.5px;
+  background-color: rgb(128, 148, 130);
+}
+    #cabecera {
+      background-color: orange;
+      padding-top: 0.25em;
+      padding-bottom: 0.5em;
+      text-align: center;
+      font-size: 2.5em;
+    }
+
+    #cuerpo {
+      position: relative;
+      background-color: bisque;
+      height: 12em;
+      font-size: 2.5em;
+    }
+
+    #uno {
+      position: absolute;
+      top: 0.75em;
+      left: 3.6em;
+      z-index: 1;
+    }
+
+    #dos {
+      position: absolute;
+      top: 1.65em;
+      left: 5.9em;
+      z-index: 2;
+    }
+
+    #tres {
+      position: absolute;
+      top: 1.4em;
+      left: 4.19em;
+      z-index: 3;
+      visibility: hidden;
+    }
+
+    #operacion {
+      position: absolute;
+      top: 6em;
+      left: 3em;
+    }
+
+    #eResultado {
+      position: absolute;
+      top: 0.04em;
+      left: 5.1em;
+      width: 1.5em;
+      height: 1em;
+      border: 1px solid black;
+      background-color: orange;
+      outline: none;
+      font-size: 1em;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    table {
+      position: absolute;
+      top: 13em;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 9.5em;
+      border-collapse: collapse;
+      background-color: orange;
+      text-align:center;
+      font-size:0.75em;
+    }
+
+    td {
+      height: 1.25em;
+      border: 1px solid black;
+      padding: 0.15em;
+    }
+
+    #ePuntos{
+      width: 3em;
+    }
+    #Record {
+      width: 4em;
+    }
+    #flecha {
+      width: 2em; cursor: pointer;
+    }
+
+    @keyframes rotar {
+      0% {
+        rotate: 0deg;
+        transform-origin: bottom center;
+      }
+      100% {
+        rotate: 360deg;
+        transform-origin: bottom center;
+      }
+    }
+    .key-row {
+      display: none;
+    }
+    
+    @media (max-width: 1024px) {
+    #cuerpo {
+      height: 15em;
+    }  
+    table {
+      position: absolute;
+      top: 17em;
+    }
+
+     #teclado {
+      position: absolute;
+      top: 8.5em;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+      .key-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .key-button {
+      width: 1.5em;
+      height: 1.5em;
+      padding: 0;
+      margin: 0.15em;
+      background-color: #e0e0e0;
+      border: 1px solid black;
+      border-radius: 6px;
+      box-shadow:
+      4px 4px 0 rgba(0, 0, 0, 0.6),   /* Sombra a la derecha y abajo */
+        inset 0 1px 0 #fff, /* Iluminación interior superior */
+        inset 0 -1px 2px #bbb; /* Sombra interior inferior */
+      font-size: 0.75em;
+      color: #333;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease-in-out;
+    }
+
+    .key-button:active {
+      box-shadow:
+        1px 1px 0 #999,
+        inset 0 2px 4px #aaa;
+      transform: translate(2px, 2px);
+    }
+ }
+ @media (max-width: 500px) {
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+  }
+
+  #contenedor {
+    transform: scale(0.9);
+    transform-origin: top center;
+    width: 30em;
+    margin: 0 auto;
+  }
+  #uno{left: 1.9em;}
+  #dos{left:4.24em;}
+  #tres{left: 2.45em;}
+  #operacion {left: 0.75em;}
+}
+
+  </style>
+
+<script>
+  window.onload = cargar;
+  var vPuntos = 0;
+  var vPuntosHoy;
+  var vRecord = parseInt(localStorage.getItem("record"));
+  var estadoJuego = "inicio";
+  var vModelo;
+  var temporizador;
+
+  if (localStorage.record == undefined) {
+    localStorage.setItem("record", vPuntos);
+    vRecord = parseInt(localStorage.getItem("record"));
+  }
+
+  function cargar() {
+    recargar();
+    document.getElementById("flecha").style.display = "block";
+
+    const input = document.getElementById("eResultado");
+
+    if (window.innerWidth <= 1024) {
+      document.getElementById("teclado").style.display = "block";
+      input.setAttribute("readonly", true);
+
+      // Evita que el teclado Android aparezca
+      input.addEventListener("focus", (e) => {
+        e.preventDefault();
+        input.blur(); // fuerza a perder el foco
+      });
+
+    } else {
+      document.getElementById("teclado").style.display = "none";
+      input.removeAttribute("readonly");
+    }
+  }
+
+  function gestionarFlecha() {
+    vPuntos = 0;
+    document.getElementById("ePuntos").innerHTML = vPuntos; // Reinicia marcador
+    document.getElementById("eResultado").value = "";       // Limpia input
+    document.getElementById("eResultado").readOnly = false;
+    document.getElementById("eResultado").style.color = "black";
+    iniciarRonda();
+    estadoJuego = "jugando";
+  }
+
+  function iniciarRonda() {
+    if (window.innerWidth > 1024) {
+      document.getElementById("eResultado").focus();
+    }
+    document.getElementById("tres").style.visibility = "hidden";
+    document.getElementById("dos").style.animation = "rotar 7s linear reverse";
+    crono();
+    temporizador = setTimeout(tiempo, 7000);
+  }
+
+  function tiempo() {
+    document.getElementById("dos").style.animation = "null";
+    document.getElementById("eResultado").readOnly = true;
+    document.getElementById("tres").style.visibility = "visible";
+    vPuntosHoy = vPuntos;
+
+    if (vRecord < vPuntosHoy) {
+      localStorage.setItem("record", vPuntosHoy);
+      vRecord = parseInt(localStorage.getItem("record"));
+      document.getElementById("eRecord").innerHTML = vRecord;
+    }
+  }
+
+  function crono() {
+    document.getElementById("dos").style.animation = "rotar 7s linear reverse";
+  }
+
+  function pulsar(e) {
+    var tecla = (document.all) ? e.keyCode : e.which;
+    if (tecla === 13) {
+      corregir();
+    }
+  }
+
+  function corregir() {
+    var vResultado = document.getElementById("eResultado").value;
+    if (vResultado == vModelo) {
+      ++vPuntos;
+      document.getElementById("ePuntos").innerHTML = vPuntos;
+      clearTimeout(temporizador);
+      document.getElementById("dos").style.animation = "null";
+      recargar();
+      setTimeout(crono, 1);
+      temporizador = setTimeout(tiempo, 7000);
+    } else if (vResultado == "") {
+      // No hace nada
+    } else {
+      document.getElementById("dos").style.animation = "null";
+      document.getElementById("eResultado").readOnly = true;
+      document.getElementById("eResultado").style.color = "red";
+      clearTimeout(temporizador);
+      vPuntosHoy = vPuntos;
+
+      if (vRecord < vPuntosHoy) {
+        localStorage.setItem("record", vPuntosHoy);
+        vRecord = parseInt(localStorage.getItem("record"));
+        document.getElementById("eRecord").innerHTML = vRecord;
+      }
+    }
+  }
+
+  function recargar() {
+    var vAleatorio = Math.floor(Math.random() * 4 + 1);
+    if (vAleatorio == 1) recargarS();
+    else if (vAleatorio == 2) recargarR();
+    else if (vAleatorio == 3) recargarM();
+    else recargarD();
+  }
+
+  function recargarS() {
+    var S1 = Math.floor(Math.random() * 10);
+    var S2 = Math.floor(Math.random() * 10);
+    vModelo = S1 + S2;
+    actualizarOperacion(S1, "+", S2);
+  }
+
+  function recargarR() {
+    var R2 = Math.floor(Math.random() * 9 + 1);
+    var R1 = Math.floor(Math.random() * 10 + R2);
+    vModelo = R1 - R2;
+    actualizarOperacion(R1, "-", R2);
+  }
+
+  function recargarM() {
+    var M1 = Math.floor(Math.random() * 9 + 1);
+    var M2 = Math.floor(Math.random() * 10);
+    vModelo = M1 * M2;
+    actualizarOperacion(M1, "x", M2);
+  }
+
+  function recargarD() {
+    var D2 = Math.floor(Math.random() * 9 + 1);
+    var D1 = Math.floor(Math.random() * 9 + 1) * D2;
+    vModelo = D1 / D2;
+    actualizarOperacion(D1, ":", D2);
+  }
+
+  function actualizarOperacion(op1, signo, op2) {
+    document.getElementById("operando1").innerHTML = op1;
+    document.getElementById("signo").innerHTML = signo;
+    document.getElementById("operando2").innerHTML = op2;
+    document.getElementById("ePuntos").innerHTML = vPuntos;
+    document.getElementById("eRecord").innerHTML = vRecord;
+    document.getElementById("eResultado").value = "";
+  }
+
+  // Funciones para teclado virtual
+  function agregarNumero(n) {
+    var input = document.getElementById("eResultado");
+    input.value += n;
+  }
+
+  function borrarUltimo() {
+    var input = document.getElementById("eResultado");
+    input.value = input.value.slice(0, -1);
+  }
+
+  function confirmarNumero() {
+    corregir();
+  }
+</script>
+
+
+</head>
+
+<body>
+  <div id="contenedor">
+  <div id="cabecera">Cálculo Contrarreloj</div>
+
+  <div id="cuerpo">
+    <img id="uno" src="Imagenes/relojNaranja.jpg">
+    <img id="dos" src="Imagenes/aguja.png">
+    <img id="tres" src="Imagenes/stop.png">
+
+    <p id="operacion">
+      <span id="operando1"></span>&nbsp;
+      <span id="signo"></span>&nbsp;
+      <span id="operando2"></span> =
+      <input type="text" id="eResultado" maxlength="2" onkeypress="pulsar(event)">
+    </p>
+
+    <!-- ⌨️ Teclado para tablets y móviles -->
+    <div id="teclado">
+    <div class="key-row">
+    <button class="key-button" onclick="agregarNumero('7')">7</button>
+    <button class="key-button" onclick="agregarNumero('8')">8</button>
+    <button class="key-button" onclick="agregarNumero('9')">9</button>
+    <button class="key-button" onclick="confirmarNumero()">?</button>
+    </div>
+    <div class="key-row">
+    <button class="key-button" onclick="agregarNumero('4')">4</button>
+    <button class="key-button" onclick="agregarNumero('5')">5</button>
+    <button class="key-button" onclick="agregarNumero('6')">6</button>
+    <button class="key-button" onclick="borrarUltimo()">⌫</button>
+    </div>
+    <div class="key-row">
+    <button class="key-button" onclick="agregarNumero('1')">1</button>
+    <button class="key-button" onclick="agregarNumero('2')">2</button>
+    <button class="key-button" onclick="agregarNumero('3')">3</button>
+    <button class="key-button" onclick="agregarNumero('0')">0</button>
+    </div>
+  </div>
+
+    <!-- Tabla de puntos -->
+    <table>
+      <tr>
+        <td id="ePuntos"></td>
+        <td id="flecha">
+          <img src="Imagenes/empezarNaranja.png" style="position:relative; top:2px;width: 35px; height:auto;" onclick="gestionarFlecha()">
+        </td>
+        <td id="Record">
+          <img src="Imagenes/corona.png" style="position:relative; top:1px; width:30px; height:auto;">
+          <span id="eRecord"></span>
+        </td>
+      </tr>
+    </table>
+  </div>
+  </div>
+</body>
+
+</html>

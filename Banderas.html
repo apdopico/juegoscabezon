@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Banderas</title>
+<meta name="language" content="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+<style>
+  body{position:relative;width:30em;top:1em;margin:2em auto;background-color:#3d5c5c;background-image: url("../Imagenes/imagenFondo.png");text-align:center;}
+  p{margin:1em 0;text-align:center;font-family:"Times New Roman",serif;font-size:1.75em;}
+  table{margin: 0 auto;}
+  td{border:solid black 1px;}
+  button{border:none;background-color:transparent; width:50px;height:50px;margin-top:2em;}
+  @media screen and (max-width: 600px) {
+  body {
+    width: 22.5em; /* 75% de 30em */
+    font-size: 0.75em;
+  }
+  button {
+    width: 35px;  /* tamaño fijo para botón */
+    height: 35px;
+    margin: 1.5em auto 0 auto; /* centrado horizontal */
+    display: block;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+  }
+  button img {
+    width: 100%; /* La imagen dentro del botón ocupa todo */
+    height: auto;
+    display: block;
+  }
+  td img {
+     width: 100%;  /* imágenes más grandes dentro de la celda */
+    height: auto;
+  }
+}
+
+</style>
+</head>
+<body>
+    <table id="t1">
+        <tr>
+            <td id="c1"><img src="Imagenes/b1.png" onclick="seleccionarBandera(1)"></td>
+            <td id="c2"><img src="Imagenes/b2.png" onclick="seleccionarBandera(2)"></td>
+            <td id="c3"><img src="Imagenes/b3.png" onclick="seleccionarBandera(3)"></td>
+            <td id="c4"><img src="Imagenes/b4.png" onclick="seleccionarBandera(4)"></td>
+        </tr>
+        <tr>
+            <td id="c5"><img src="Imagenes/b5.png" onclick="seleccionarBandera(5)"></td>
+            <td id="c6"><img src="Imagenes/b6.png" onclick="seleccionarBandera(6)"></td>
+            <td id="c7"><img src="Imagenes/b7.png" onclick="seleccionarBandera(7)"></td>
+            <td id="c8"><img src="Imagenes/b8.png" onclick="seleccionarBandera(8)"></td>
+        </tr>
+        <tr>
+            <td id="c9"><img src="Imagenes/b9.png" onclick="seleccionarBandera(9)"></td>
+            <td id="c10"><img src="Imagenes/b10.png" onclick="seleccionarBandera(10)"></td>
+            <td id="c11"><img src="Imagenes/b11.png" onclick="seleccionarBandera(11)"></td>
+            <td id="c12"><img src="Imagenes/b12.png" onclick="seleccionarBandera(12)"></td>
+        </tr>
+        <tr>
+            <td id="c13"><img src="Imagenes/b13.png" onclick="seleccionarBandera(13)"></td>
+            <td id="c14"><img src="Imagenes/b14.png" onclick="seleccionarBandera(14)"></td>
+            <td id="c15"><img src="Imagenes/b15.png" onclick="seleccionarBandera(15)"></td>
+            <td id="c16"><img src="Imagenes/b16.png" onclick="seleccionarBandera(16)"></td>
+        </tr>
+     </table>
+ <p id="texto">¿Qué bandera falta?</p>
+ <table id="t2">
+    <tr><td id=c1b><img src="Imagenes/b1.png"></td><td id=c2b><img src="Imagenes/b2.png"></td><td id=c3b><img src="Imagenes/b3.png"></td><td id=c4b><img src="Imagenes/b4.png"></td></tr>
+    <tr><td id=c5b><img src="Imagenes/b5.png"></td><td id=c6b><img src="Imagenes/b6.png"></td><td id=c7b><img src="Imagenes/b7.png"></td><td id=c8b><img src="Imagenes/b8.png"></td></tr>
+    <tr><td id=c9b><img src="Imagenes/b9.png"></td><td id=c10b><img src="Imagenes/b10.png"></td><td id=c11b><img src="Imagenes/b11.png"></td><td id=c12b><img src="Imagenes/b12.png"></td></tr>
+    <tr><td id=c13b><img src="Imagenes/b13.png"></td><td id=c14b><img src="Imagenes/b14.png"></td><td id=c15b><img src="Imagenes/b15.png"></td><td id=c16b><img src="Imagenes/b16.png"></td></tr>
+ </table>
+ <button onclick="cargar()"><img src="Imagenes/jugarB.png"></button>
+</body>
+<script>
+     function mezclarArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Intercambia elementos
+        }
+        return array;
+    }
+
+    // Función para reordenar las imágenes en una tabla
+    function reordenarTabla(idTabla) {
+        // Obtiene todas las celdas <td> que contienen las imágenes dentro de la tabla especificada
+        const celdas = Array.from(document.querySelectorAll(`#${idTabla} td`));
+        
+        // Mezcla el array de celdas aleatoriamente
+        const celdasMezcladas = mezclarArray(celdas);
+        
+        // Selecciona el cuerpo de la tabla para poder reordenar las celdas
+        const tabla = document.getElementById(idTabla);
+        tabla.innerHTML = ""; // Limpia la tabla
+        
+        // Recorre las celdas mezcladas y las vuelve a insertar en la tabla
+        let fila;
+        for (let i = 0; i < celdasMezcladas.length; i++) {
+            if (i % 4 === 0) {
+                fila = document.createElement("tr");
+                tabla.appendChild(fila);
+            }
+            fila.appendChild(celdasMezcladas[i]);
+        }
+    }
+    var n = Math.floor(Math.random() * 16) + 1;
+    function eliminarBandera() {
+    var celda = document.getElementById("c" + n + "b");
+    if (celda) {celda.innerHTML = ""; }
+    }
+    function cargar() {
+        reordenarTabla("t1");
+        reordenarTabla("t2");
+        eliminarBandera();
+    }
+    window.onload=cargar;
+    var nBandera;
+    function seleccionarBandera(numero){
+        nBandera = numero; // Almacena el número de la bandera seleccionada
+        if (n === nBandera) { // Comprueba si coincide con la bandera eliminada
+            var celda = document.getElementById("c" + n + "b"); // Obtiene la celda correspondiente
+            if (celda) {
+                celda.innerHTML = `<img src="Imagenes/b${n}.png">`; // Restaura la imagen
+                document.getElementById("texto").innerHTML ="¡Correcto!";
+            }
+        } else {
+            document.getElementById("texto").innerHTML ="¡Inténtalo de nuevo!";
+        }
+    }
+</script>
+</html>

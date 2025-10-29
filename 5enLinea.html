@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Cinco en línea</title>
+    <meta name="language" content="es">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      margin-top: 3em;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      aspect-ratio: 1 / 1;
+      width: min(90vmin, 600px); /* adapta sin crecer demasiado */
+      max-width: 100%;
+      background-color: #000;
+      gap: 1px;
+      border: 2px solid #000;
+      margin-bottom: 1rem;
+    }
+
+    .cell {
+     background-color: #fff;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     font-size:  clamp(14px, 4vmin, 40px);
+     width: 100%;
+     aspect-ratio: 1 / 1;
+     min-height: 0;
+     min-width: 0;
+     overflow: hidden;
+     cursor: pointer;
+}
+    .black { color: black; }
+    .white { color: white; text-shadow: 0 0 1px #000; }
+    .x { color: blue; }
+    .o { color: green; }
+    .winning-cell { background-color: yellow !important; }
+
+    #resetBtn {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    #resetBtn img {
+  width: 60px; /* tamaño escritorio */
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  #resetBtn img {
+    width: 50px; /* tablet */
+  }
+}
+
+@media (max-width: 480px) {
+  #resetBtn img {
+    width: 40px; /* móvil */
+  }
+}
+
+    /* Tablet */
+    @media (max-width: 768px) {
+      #resetBtn img {
+        width: 45px;
+      }
+    }
+
+    /* Móvil */
+    @media (max-width: 480px) {
+      #resetBtn img {
+        width: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="board">
+      <!-- Las celdas se deben generar con JS -->
+    </div>
+    <button id="resetBtn" onclick="resetGame()">
+      <img src="Imagenes/reiniciar1.png" alt="Reiniciar">
+    </button>
+  </div>
+  <script>
+    const board = document.getElementById("board");
+
+    // Crear 15x15 = 225 celdas
+    for (let i = 0; i < 225; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      board.appendChild(cell);
+    }
+
+    function resetGame() {
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "cell";
+      });
+    }
+  </script>
+</body>
+</html>
+
+    <script>
+        const boardSize = 15;
+        const userSq = 'X';
+        const machSq = 'O';
+        const blinkSq = "b-1";
+        const blinkHint = "b1";
+        let myTurn = false;
+        const winningMove = 9999999;
+        const openFour = 8888888;
+        const twoThrees = 7777777;
+
+        let f = Array(boardSize).fill().map(() => Array(boardSize).fill(''));
+        let s = Array(boardSize).fill().map(() => Array(boardSize).fill(0));
+        let q = Array(boardSize).fill().map(() => Array(boardSize).fill(0));
+
+        let iMax = [], jMax = [], nMax = 0;
+        let iLastUserMove = 0, jLastUserMove = 0;
+        let hintShown = false, iHint = 6, jHint = 6;
+        let autoplayOn = false, timerAP = 0, timerDR = 0, gameOver = false, drawPos = false;
+
+        function init() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            for (let i = 0; i < boardSize; i++) {
+                for (let j = 0; j < boardSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('click', () => clk(i, j));
+                    board.appendChild(cell);
+                }
+            }
+            resetGame();
+        }
+
+        function clk(iMove, jMove) {
+            if (myTurn || autoplayOn || gameOver) return;
+            hideHint();
+
+            if (f[iMove][jMove] !== '') {
+                alert('This square is not empty! Please choose another.');
+                return;
+            }
+
+            f[iMove][jMove] = userSq;
+            drawSquare(iMove, jMove, userSq);
+
+            let winningCells = checkWinningPos(iMove, jMove, userSq);
+            if (winningCells.length > 0) {
+                highlightWinningCells(winningCells);
+                gameOver = true;
+            } else {
+                myTurn = true;
+                iLastUserMove = iMove;
+                jLastUserMove = jMove;
+                setTimeout(() => machineMove(iLastUserMove, jLastUserMove), 500);
+            }
+        }
+
+        function drawSquare(i, j, value) {
+            const cell = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+            if (cell) {
+                cell.textContent = value;
+                if (value === 'X') {
+                    cell.classList.add('x');
+                    cell.classList.remove('o');
+                } else if (value === 'O') {
+                    cell.classList.add('o');
+                    cell.classList.remove('x');
+                }
+            }
+        }
+
+        function resetGame() {
+            if (autoplayOn) {
+                autoplayOn = false;
+                clearTimeout(timerAP);
+                clearTimeout(timerDR);
+            }
+            drawPos = false;
+            myTurn = false;
+            autoplayOn = false;
+            gameOver = false;
+
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o', 'winning-cell');
+            });
+
+            for (let i = 0; i < boardSize; i++) {
+                for (let j = 0; j < boardSize; j++) {
+                    f[i][j] = '';
+                }
+            }
+        }
+
+        function machineMove(iUser, jUser) {
+            getBestMachMove();
+            f[iMach][jMach] = machSq;
+            drawSquare(iMach, jMach, machSq);
+
+            let winningCells = checkWinningPos(iMach, jMach, machSq);
+            if (winningCells.length > 0) {
+                highlightWinningCells(winningCells);
+                gameOver = true;
+            } else {
+                myTurn = false;
+            }
+        }
+
+        function checkWinningPos(i, j, mySq) {
+            let winningCells = [];
+
+            // Check horizontal
+            let count = 0;
+            let cells = [];
+            for (let col = Math.max(0, j - 4); col <= Math.min(boardSize - 1, j + 4); col++) {
+                if (f[i][col] === mySq) {
+                    count++;
+                    cells.push({i, j: col});
+                    if (count === 5) {
+                        return cells.slice(-5);
+                    }
+                } else {
+                    count = 0;
+                    cells = [];
+                }
+            }
+
+            // Check vertical
+            count = 0;
+            cells = [];
+            for (let row = Math.max(0, i - 4); row <= Math.min(boardSize - 1, i + 4); row++) {
+                if (f[row][j] === mySq) {
+                    count++;
+                    cells.push({i: row, j});
+                    if (count === 5) {
+                        return cells.slice(-5);
+                    }
+                } else {
+                    count = 0;
+                    cells = [];
+                }
+            }
+
+            // Check diagonal (top-left to bottom-right)
+            count = 0;
+            cells = [];
+            for (let d = -4; d <= 4; d++) {
+                let row = i + d;
+                let col = j + d;
+                if (row >= 0 && row < boardSize && col >= 0 && col < boardSize && f[row][col] === mySq) {
+                    count++;
+                    cells.push({i: row, j: col});
+                    if (count === 5) {
+                        return cells.slice(-5);
+                    }
+                } else {
+                    count = 0;
+                    cells = [];
+                }
+            }
+
+            // Check diagonal (top-right to bottom-left)
+            count = 0;
+            cells = [];
+            for (let d = -4; d <= 4; d++) {
+                let row = i + d;
+                let col = j - d;
+                if (row >= 0 && row < boardSize && col >= 0 && col < boardSize && f[row][col] === mySq) {
+                    count++;
+                    cells.push({i: row, j: col});
+                    if (count === 5) {
+                        return cells.slice(-5);
+                    }
+                } else {
+                    count = 0;
+                    cells = [];
+                }
+            }
+
+            return [];
+        }
+
+        function highlightWinningCells(winningCells) {
+            winningCells.forEach(cell => {
+                const { i, j } = cell;
+                const winningCell = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+                if (winningCell) {
+                    winningCell.classList.add('winning-cell');
+                }
+            });
+        }
+
+        function getBestMachMove() {
+            for (let i = 0; i < boardSize; i++) {
+            for (let j = 0; j < boardSize; j++) {
+            if (f[i][j] === '') {
+                f[i][j] = machSq;
+                let winningCells = checkWinningPos(i, j, machSq);
+                f[i][j] = ''; // deshacer movimiento simulado
+
+                if (winningCells.length > 0) {
+                    iMach = i;
+                    jMach = j;
+                    return;
+                }
+            }
+        }
+    }
+        for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+            if (f[i][j] === '') {
+                f[i][j] = userSq;
+                let winningCells = checkWinningPos(i, j, userSq);
+                f[i][j] = ''; // deshacer movimiento simulado
+
+                if (winningCells.length > 0) {
+                    iMach = i;
+                    jMach = j;
+                    return;
+                }
+            }
+        }
+    }    
+            let maxS = evaluatePos(s, userSq);
+            let maxQ = evaluatePos(q, machSq);
+
+            if (maxQ >= maxS) {
+                maxS = -1;
+                for (let i = 0; i < boardSize; i++) {
+                    for (let j = 0; j < boardSize; j++) {
+                        if (q[i][j] === maxQ) {
+                            if (s[i][j] > maxS) {
+                                maxS = s[i][j];
+                                nMax = 0;
+                                iMax = [i];
+                                jMax = [j];
+                            } else if (s[i][j] === maxS) {
+                                iMax.push(i);
+                                jMax.push(j);
+                                nMax++;
+                            }
+                        }
+                    }
+                }
+            } else {
+                maxQ = -1;
+                for (let i = 0; i < boardSize; i++) {
+                    for (let j = 0; j < boardSize; j++) {
+                        if (s[i][j] === maxS) {
+                            if (q[i][j] > maxQ) {
+                                maxQ = q[i][j];
+                                nMax = 0;
+                                iMax = [i];
+                                jMax = [j];
+                            } else if (q[i][j] === maxQ) {
+                                iMax.push(i);
+                                jMax.push(j);
+                                nMax++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            let randomK = Math.floor(Math.random() * nMax);
+            iMach = iMax[randomK];
+            jMach = jMax[randomK];
+        }
+
+        function evaluatePos(a, mySq) {
+            let maxA = -1;
+            drawPos = false;
+
+            for (let i = 0; i < boardSize; i++) {
+                for (let j = 0; j < boardSize; j++) {
+                    if (f[i][j] !== '') {
+                        a[i][j] = -1;
+                        continue;
+                    }
+
+                    let wp = winningPos(i, j, mySq);
+                    if (wp > 0) {
+                        a[i][j] = wp;
+                    } else {
+                        let minM = Math.max(0, i - 4);
+                        let minN = Math.max(0, j - 4);
+                        let maxM = Math.min(boardSize, i + 5);
+                        let maxN = Math.min(boardSize, j + 5);
+
+                        let nPos = [1, 1, 1, 1];
+                        let dirA = [0, 0, 0, 0];
+
+                        let A1 = 0, m = 1;
+                        while (j + m < maxN && f[i][j + m] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[0]++;
+                            A1 += w[m] * (f[i][j + m] === mySq ? 1 : 0);
+                            m++;
+                        }
+                        if (j + m >= boardSize || f[i][j + m] === (mySq === 'X' ? 'O' : 'X')) {
+                            A1 -= (f[i][j + m - 1] === mySq) ? w[5] : 0;
+                        }
+
+                        m = 1;
+                        while (j - m >= minN && f[i][j - m] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[0]++;
+                            A1 += w[m] * (f[i][j - m] === mySq ? 1 : 0);
+                            m++;
+                        }
+                        if (j - m < 0 || f[i][j - m] === (mySq === 'X' ? 'O' : 'X')) {
+                            A1 -= (f[i][j - m + 1] === mySq) ? w[5] : 0;
+                        }
+
+                        let A2 = 0, m2 = 1;
+                        while (i + m2 < maxM && f[i + m2][j] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[1]++;
+                            A2 += w[m2] * (f[i + m2][j] === mySq ? 1 : 0);
+                            m2++;
+                        }
+                        if (i + m2 >= boardSize || f[i + m2][j] === (mySq === 'X' ? 'O' : 'X')) {
+                            A2 -= (f[i + m2 - 1][j] === mySq) ? w[5] : 0;
+                        }
+
+                        m2 = 1;
+                        while (i - m2 >= minM && f[i - m2][j] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[1]++;
+                            A2 += w[m2] * (f[i - m2][j] === mySq ? 1 : 0);
+                            m2++;
+                        }
+                        if (i - m2 < 0 || f[i - m2][j] === (mySq === 'X' ? 'O' : 'X')) {
+                            A2 -= (f[i - m2 + 1][j] === mySq) ? w[5] : 0;
+                        }
+
+                        let A3 = 0, m3 = 1;
+                        while (i + m3 < maxM && j + m3 < maxN && f[i + m3][j + m3] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[2]++;
+                            A3 += w[m3] * (f[i + m3][j + m3] === mySq ? 1 : 0);
+                            m3++;
+                        }
+                        if (i + m3 >= boardSize || j + m3 >= boardSize || f[i + m3][j + m3] === (mySq === 'X' ? 'O' : 'X')) {
+                            A3 -= (f[i + m3 - 1][j + m3 - 1] === mySq) ? w[5] : 0;
+                        }
+
+                        m3 = 1;
+                        while (i - m3 >= minM && j - m3 >= minN && f[i - m3][j - m3] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[2]++;
+                            A3 += w[m3] * (f[i - m3][j - m3] === mySq ? 1 : 0);
+                            m3++;
+                        }
+                        if (i - m3 < 0 || j - m3 < 0 || f[i - m3][j - m3] === (mySq === 'X' ? 'O' : 'X')) {
+                            A3 -= (f[i - m3 + 1][j - m3 + 1] === mySq) ? w[5] : 0;
+                        }
+
+                        let A4 = 0, m4 = 1;
+                        while (i + m4 < maxM && j - m4 >= minN && f[i + m4][j - m4] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[3]++;
+                            A4 += w[m4] * (f[i + m4][j - m4] === mySq ? 1 : 0);
+                            m4++;
+                        }
+                        if (i + m4 >= boardSize || j - m4 < 0 || f[i + m4][j - m4] === (mySq === 'X' ? 'O' : 'X')) {
+                            A4 -= (f[i + m4 - 1][j - m4 + 1] === mySq) ? w[5] : 0;
+                        }
+
+                        m4 = 1;
+                        while (i - m4 >= minM && j + m4 < maxN && f[i - m4][j + m4] !== (mySq === 'X' ? 'O' : 'X')) {
+                            nPos[3]++;
+                            A4 += w[m4] * (f[i - m4][j + m4] === mySq ? 1 : 0);
+                            m4++;
+                        }
+                        if (i - m4 < 0 || j + m4 >= boardSize || f[i - m4][j + m4] === (mySq === 'X' ? 'O' : 'X')) {
+                            A4 -= (f[i - m4 + 1][j + m4 - 1] === mySq) ? w[5] : 0;
+                        }
+
+                        dirA[0] = (nPos[0] > 4) ? A1 * A1 : 0;
+                        dirA[1] = (nPos[1] > 4) ? A2 * A2 : 0;
+                        dirA[2] = (nPos[2] > 4) ? A3 * A3 : 0;
+                        dirA[3] = (nPos[3] > 4) ? A4 * A4 : 0;
+
+                        let A = 0, ASecond = 0;
+                        for (let k = 0; k < 4; k++) {
+                            if (dirA[k] >= A) {
+                                ASecond = A;
+                                A = dirA[k];
+                            }
+                        }
+
+                        a[i][j] = A + ASecond;
+                    }
+
+                    if (a[i][j] > maxA) {
+                        maxA = a[i][j];
+                    }
+                }
+            }
+            return maxA;
+        }
+
+        function winningPos(i, j, mySq) {
+            return checkWinningPos(i, j, mySq).length > 0 ? winningMove : -1;
+        }
+
+        const w = [0, 20, 17, 15.4, 14, 10];
+
+        function hideHint() {
+            hintShown = false;
+            drawSquare(iHint, jHint, f[iHint][jHint]);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salto de la rana</title>
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png" />
+  <style>
+    body {
+      background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+      margin: 0;
+      text-align: center;
+      font-family: sans-serif;
+    }
+
+    .nivel-container {
+      margin: 5px auto;
+      padding: 2px;
+      max-width: 90%;
+    }
+
+    .juego {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+      margin: 20px 0;
+      flex-wrap: nowrap; /* nunca saltar de línea */
+      width: 100%;
+    }
+
+    /* 📱 Por defecto (móviles y pantallas pequeñas): tamaño dinámico */
+    .celda {
+      flex: 0 0 var(--celda-width);
+      aspect-ratio: 1 / 1;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .celda img {
+      width: 80%;
+      height: auto;
+    }
+
+    img.victoria {
+      width: 70%;
+      height: auto;
+    }
+
+    /* 🖥️ En pantallas grandes, usar tamaño fijo */
+    @media (min-width: 1024px) {
+      .celda {
+        flex: none;
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .botones-globales {
+      margin: 20px auto 40px;
+      max-width: 200px;
+      display: flex;
+      justify-content: center;
+      padding: 0 10px;
+    }
+
+    .btn-atras {
+      background-image: url('Imagenes/ranas.png');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      font-weight: bold;
+      font-size: clamp(12px, 3vw, 16px); /* escala con pantalla */
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      width: clamp(70px, 20vw, 113px);
+      height: clamp(28px, 8vw, 45px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 1px 1px 2px black;
+      border-radius: 0;
+      transition: all 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="niveles"></div>
+
+  <div class="botones-globales">
+    <button id="btn-deshacer" class="btn-atras" title="Atrás" aria-label="Atrás">Paso <br> atrás</button>
+  </div>
+
+  <script>
+    const niveles = [2, 3, 4, 5];
+    const contenedor = document.getElementById('niveles');
+
+    const estados = {};
+    const historiales = {};
+
+    niveles.forEach(n => crearNivel(n));
+
+    function crearNivel(cantidad) {
+      const divNivel = document.createElement('div');
+      divNivel.className = 'nivel-container';
+
+      const divJuego = document.createElement('div');
+      divJuego.className = 'juego';
+      divJuego.id = `juego-${cantidad}`;
+
+      // 📏 Calcular ancho proporcional de cada celda según nivel (solo útil en pantallas pequeñas)
+      const totalCeldas = cantidad * 2 + 1;
+      divJuego.style.setProperty('--celda-width', `calc(100% / ${totalCeldas})`);
+
+      divNivel.appendChild(divJuego);
+      contenedor.appendChild(divNivel);
+
+      estados[cantidad] = generarEstado(cantidad);
+      historiales[cantidad] = [];
+
+      function generarEstado(cuantas) {
+        return [...Array(cuantas).fill('marron'), null, ...Array(cuantas).fill('verde')];
+      }
+
+      function render() {
+        divJuego.innerHTML = '';
+
+        estados[cantidad].forEach((valor, i) => {
+          const celda = document.createElement('div');
+          celda.className = 'celda';
+
+          if (valor === 'marron') {
+            const img = document.createElement('img');
+            img.src = 'Imagenes/ranaM.png';
+            img.alt = 'Rana Marrón';
+            celda.appendChild(img);
+          } else if (valor === 'verde') {
+            const img = document.createElement('img');
+            img.src = 'Imagenes/ranaV.png';
+            img.alt = 'Rana Verde';
+            celda.appendChild(img);
+          } else if (valor === 'ganador') {
+            const img = document.createElement('img');
+            img.src = 'Imagenes/ranasB.png';
+            img.alt = 'Victoria';
+            img.className = 'victoria';
+            celda.appendChild(img);
+          }
+
+          celda.addEventListener('click', () => mover(i));
+          divJuego.appendChild(celda);
+        });
+      }
+
+      function mover(i) {
+        const vacio = estados[cantidad].indexOf(null);
+        const distancia = vacio - i;
+        const rana = estados[cantidad][i];
+
+        const direccionValida =
+          (rana === 'marron' && distancia > 0 && distancia <= 2) ||
+          (rana === 'verde' && distancia < 0 && distancia >= -2);
+
+        if (direccionValida) {
+          historiales[cantidad].push([...estados[cantidad]]);
+          estados[cantidad][vacio] = estados[cantidad][i];
+          estados[cantidad][i] = null;
+          render();
+          verificarGanador();
+        }
+      }
+
+      function verificarGanador() {
+        const meta = [...Array(cantidad).fill('verde'), null, ...Array(cantidad).fill('marron')];
+        if (JSON.stringify(estados[cantidad]) === JSON.stringify(meta)) {
+          estados[cantidad][cantidad] = 'ganador';
+          render();
+        }
+      }
+
+      render();
+    }
+
+    document.getElementById('btn-deshacer').addEventListener('click', () => {
+      for (let i = niveles.length - 1; i >= 0; i--) {
+        const cantidad = niveles[i];
+        if (historiales[cantidad].length > 0) {
+          estados[cantidad] = historiales[cantidad].pop();
+          renderNivel(cantidad);
+          return;
+        }
+      }
+      alert("No hay movimientos que deshacer.");
+    });
+
+    function moverGeneral(cantidad, i) {
+      const vacio = estados[cantidad].indexOf(null);
+      const distancia = vacio - i;
+      const rana = estados[cantidad][i];
+
+      const direccionValida =
+        (rana === 'marron' && distancia > 0 && distancia <= 2) ||
+        (rana === 'verde' && distancia < 0 && distancia >= -2);
+
+      if (direccionValida) {
+        historiales[cantidad].push([...estados[cantidad]]);
+        estados[cantidad][vacio] = estados[cantidad][i];
+        estados[cantidad][i] = null;
+        renderNivel(cantidad);
+        verificarGanadorNivel(cantidad);
+      }
+    }
+
+    function renderNivel(cantidad) {
+      const divJuego = document.getElementById(`juego-${cantidad}`);
+      divJuego.innerHTML = '';
+
+      estados[cantidad].forEach((valor, i) => {
+        const celda = document.createElement('div');
+        celda.className = 'celda';
+
+        if (valor === 'marron') {
+          const img = document.createElement('img');
+          img.src = 'Imagenes/ranaM.png';
+          img.alt = 'Rana Marrón';
+          celda.appendChild(img);
+        } else if (valor === 'verde') {
+          const img = document.createElement('img');
+          img.src = 'Imagenes/ranaV.png';
+          img.alt = 'Rana Verde';
+          celda.appendChild(img);
+        } else if (valor === 'ganador') {
+          const img = document.createElement('img');
+          img.src = 'Imagenes/ranasB.png';
+          img.alt = 'Victoria';
+          img.className = 'victoria';
+          celda.appendChild(img);
+        }
+
+        celda.addEventListener('click', () => {
+          moverGeneral(cantidad, i);
+        });
+
+        divJuego.appendChild(celda);
+      });
+    }
+
+    function verificarGanadorNivel(cantidad) {
+      const meta = [...Array(cantidad).fill('verde'), null, ...Array(cantidad).fill('marron')];
+      if (JSON.stringify(estados[cantidad]) === JSON.stringify(meta)) {
+        estados[cantidad][cantidad] = 'ganador';
+        renderNivel(cantidad);
+      }
+    }
+  </script>
+</body>
+</html>

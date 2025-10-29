@@ -1,0 +1,297 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baile de figuras</title>
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      background-color: #3d5c5c;
+      background-image: url("../Imagenes/imagenFondo.png");
+    }
+
+    /* Contenedor relativo para overlays */
+    .tabla-container {
+      position: relative;
+      display: inline-block;
+      margin-top: 2em;
+      margin-bottom: 2em;
+    }
+
+    /* Contenedor redondeado de la tabla */
+    .tabla-redondeada {
+      border-radius: 11px;       /* redondeo de esquinas */
+      overflow: hidden;          /* recorta esquinas de la tabla */
+      background-color: white;
+      display: inline-block;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: auto;
+      table-layout: auto;
+    }
+
+    td {
+      padding: 5px;
+    }
+
+    td img {
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: border 0.3s;
+    }
+
+    td img.error {
+      border: 3px solid red;
+      border-radius: 11px;
+    }
+
+    td img.correcto {
+      border: 3px solid green;
+      border-radius: 11px;
+    }
+
+    /* Overlay visor (sobre la tabla) */
+    #visor {
+      display: none; /* oculto por defecto */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 235px;
+      height: 345px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+     }
+
+    #visor img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Imagen de verificado flotando sobre la tabla */
+    #resultado {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    #resultado img {
+      max-width: 100px;
+      height: auto;
+    }
+
+    /* Botón triangular */
+    #btn-jugar {
+      width: 60px;
+      height: 40px;
+      background-color: white;
+      border: none;
+      border-radius: 8%;
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+      margin-top: 1em;
+    }
+
+    #btn-jugar::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 53%;
+      transform: translate(-50%, -50%);
+      width: 40%;
+      height: 60%;
+      background-color: black;
+      clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+    }
+    @media (max-width: 480px) {
+  body {
+    transform: scale(0.9); /* reduce todo el contenido al 85% */
+    transform-origin: top center; /* mantiene centrado desde arriba */
+  }
+  .tabla-container {
+  margin-bottom: 1em;
+    }
+  #btn-jugar {
+    width: 50px;
+    height: 34px;
+    margin-top: 0px;
+  }
+
+  #btn-jugar::after {
+    width: 35%;
+    height: 55%;
+  }
+
+  /* Ajuste de visor */
+  #visor {
+    width: 200px;
+    height: 290px;
+  }
+
+  #resultado img {
+    max-width: 80px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <!-- Contenedor relativo de la tabla -->
+  <div class="tabla-container">
+    <!-- Overlay visor -->
+    <div id="visor">
+      <img src="Imagenes/Rv-G.png" id="visor-img" alt="">
+    </div>
+
+    <!-- Overlay resultado -->
+    <div id="resultado">
+      <img src="Imagenes/verificado.png" alt="Verificado">
+    </div>
+
+    <!-- Contenedor redondeado de la tabla -->
+    <div class="tabla-redondeada">
+      <table>
+        <tr>
+          <td><img src="Imagenes/S-O-P.jpg" alt=""></td>
+          <td><img src="Imagenes/C-O-P.jpg" alt=""></td>
+          <td><img src="Imagenes/R-O-P.jpg" alt=""></td>
+        </tr>
+        <tr>
+          <td><img src="Imagenes/S-C-P.jpg" alt=""></td>
+          <td><img src="Imagenes/C-C-P.jpg" alt=""></td>
+          <td><img src="Imagenes/R-C-P.jpg" alt=""></td>
+        </tr>
+        <tr>
+          <td><img src="Imagenes/S-E-P.jpg" alt=""></td>
+          <td><img src="Imagenes/C-E-P.jpg" alt=""></td>
+          <td><img src="Imagenes/R-E-P.jpg" alt=""></td>
+        </tr>
+        <tr>
+          <td><img src="Imagenes/S-B-P.jpg" alt=""></td>
+          <td><img src="Imagenes/C-B-P.jpg" alt=""></td>
+          <td><img src="Imagenes/R-B-P.jpg" alt=""></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botón triangular -->
+  <button id="btn-jugar" onclick="ver()"></button>
+
+<script>
+let secuencia = [];
+let seleccionJugador = [];
+let jugando = false;
+
+const POOL_G = [
+  'Imagenes/S-O-G.jpg','Imagenes/C-O-G.jpg','Imagenes/R-O-G.jpg',
+  'Imagenes/S-C-G.jpg','Imagenes/C-C-G.jpg','Imagenes/R-C-G.jpg',
+  'Imagenes/S-E-G.jpg','Imagenes/C-E-G.jpg','Imagenes/R-E-G.jpg',
+  'Imagenes/S-B-G.jpg','Imagenes/C-B-G.jpg','Imagenes/R-B-G.jpg'
+];
+
+function shuffle(array) {
+  const a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pSrcToG(src) {
+  // convierte "Imagenes/S-O-P.jpg" o .png a "Imagenes/S-O-G.jpg"
+  return src.replace(/-P\.(jpg|jpeg|png)$/i, '-G.jpg');
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function ver() {
+  const btn = document.getElementById('btn-jugar');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
+
+  seleccionJugador = [];
+  secuencia = [];
+  jugando = false;
+  document.querySelectorAll("table img").forEach(img => {
+    img.classList.remove("error", "correcto");
+    img.style.borderRadius = "";
+  });
+  const resultadoDiv = document.getElementById("resultado");
+  if (resultadoDiv) resultadoDiv.style.display = "none";
+
+  secuencia = shuffle(POOL_G).slice(0, 4);
+
+  const visor = document.getElementById("visor");
+  const visorImg = document.getElementById("visor-img");
+  if (!visor || !visorImg) {
+    console.error("No se encontró #visor o #visor-img en el DOM.");
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    return;
+  }
+
+  visor.style.display = "flex";
+  visorImg.src = "Imagenes/Rv-G.png";
+  await sleep(1000);
+  visorImg.removeAttribute('src');
+
+  for (let i = 0; i < secuencia.length; i++) {
+    visorImg.src = secuencia[i];
+    await sleep(2000);
+  }
+
+  visor.style.display = "none";
+  jugando = true;
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+document.querySelectorAll("table img").forEach(img => {
+  img.addEventListener("click", () => {
+    if (!jugando) return;
+    if (seleccionJugador.length >= secuencia.length) return;
+
+    const seleccion = pSrcToG(img.getAttribute("src"));
+    seleccionJugador.push({ img, src: seleccion });
+
+    const paso = seleccionJugador.length - 1;
+    if (seleccion !== secuencia[paso]) {
+      img.classList.add("error");
+      img.style.borderRadius = "8px";
+      finJuego(false);
+    } else {
+      img.classList.add("correcto");
+      img.style.borderRadius = "8px";
+      if (seleccionJugador.length === secuencia.length) {
+        finJuego(true);
+      }
+    }
+  });
+});
+
+function finJuego(exito) {
+  jugando = false;
+  const resultadoDiv = document.getElementById("resultado");
+  if (resultadoDiv) resultadoDiv.style.display = exito ? "block" : "none";
+}
+</script>
+
+</body>
+</html>

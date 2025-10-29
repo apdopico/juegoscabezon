@@ -1,0 +1,307 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Divide y vencerás</title>
+  <meta name="language" content="es">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <style>
+    body {
+      position: relative;
+      max-width: 100%;
+      margin: 0 auto;
+      margin-top: 2em;
+      background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+      text-align: center;
+      font-family: "Verdana", Sanserif;
+      font-size: 2.5em;
+      padding-bottom: 12em; /* Espacio extra para el teclado */
+      overflow-x: hidden;
+    }
+    table {
+      margin: auto;
+      border-spacing: 0;
+    }
+    td {
+      padding: 0.3em;
+    }
+    .td-igual {
+      padding-right: 0.1em; 
+    }
+    .td-dividendo {
+      text-align: right;
+    }
+    input {
+      width: 4em;
+      text-align: left;
+      border: none;             
+      background-color: transparent; 
+      outline: none;  
+      font-size: inherit; 
+      font-family: inherit;   
+      padding-left: 0.1em;      
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield; 
+    }
+    input:disabled {
+      color: black;
+      background-color: transparent;
+    }
+    .input-rojo {
+      color: red;
+    }
+    #reiniciar {
+      margin-top: 1em;
+      display: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .fondo-celebracion {
+      background-image: url('Imagenes/asOros.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+    .key-row {
+      display: none;
+    }
+
+    @media (max-width: 1024px) {
+      #reiniciar {
+        display: none;
+      }
+      #teclado {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        z-index: 999;
+      }
+      .key-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0.3em;
+      }
+      .key-button {
+        width: 1.5em;
+        height: 1.5em;
+        padding: 0;
+        margin: 0.15em;
+        background-color: #e0e0e0;
+        border: 1px solid black;
+        border-radius: 6px;
+        box-shadow:
+          4px 4px 0 rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 #fff,
+          inset 0 -1px 2px #bbb;
+        font-size: 1em;
+        color: #333;
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.1s ease-in-out;
+      }
+      .key-button:active {
+        box-shadow:
+          1px 1px 0 #999,
+          inset 0 2px 4px #aaa;
+        transform: translate(2px, 2px);
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 1.5em;
+      }
+      input {
+        font-size: 1em;
+      }
+    }
+
+    .key-row:last-child {
+      margin-bottom: 2em;
+    }
+    @media (min-width: 601px) and (max-width: 1024px) {
+  body {
+    font-size: 2em;       /* reduce el tamaño general */
+    padding-bottom: 8em;  /* antes 12em → menos espacio */
+  }
+
+  .key-button {
+    width: 1.2em;   /* antes 1.5em */
+    height: 1.2em;
+    font-size: 0.9em;
+    margin: 0.1em;
+  }
+}
+  </style>
+</head>
+<body>
+  <table id="tablaJuego"></table>
+  <button id="reiniciar" onclick="location.reload()"><img src="Imagenes/jugar7.png"></button>
+
+  <div id="teclado">
+    <div class="key-row">
+      <button class="key-button" onclick="agregarNumero('7')">7</button>
+      <button class="key-button" onclick="agregarNumero('8')">8</button>
+      <button class="key-button" onclick="agregarNumero('9')">9</button>
+      <button class="key-button" onclick="confirmarNumero()">?</button>
+    </div>
+    <div class="key-row">
+      <button class="key-button" onclick="agregarNumero('4')">4</button>
+      <button class="key-button" onclick="agregarNumero('5')">5</button>
+      <button class="key-button" onclick="agregarNumero('6')">6</button>
+      <button class="key-button" onclick="borrarUltimo()">⌫</button>
+    </div>
+    <div class="key-row">
+      <button class="key-button" onclick="agregarNumero('1')">1</button>
+      <button class="key-button" onclick="agregarNumero('2')">2</button>
+      <button class="key-button" onclick="agregarNumero('3')">3</button>
+      <button class="key-button" onclick="agregarNumero('0')">0</button>
+    </div>
+  </div>
+
+  <script>
+    const numerosValidos = [
+      900375, 903168, 907200, 907578, 911250, 917504, 918540, 918750, 921600, 921984,
+      926100, 933120, 937500, 940800, 941192, 944784, 945000, 952560, 960000, 960400,
+      964467, 967680, 972000, 972405, 979776, 980000, 983040, 984150, 984375, 987840,
+      992250, 995328
+    ];
+
+    let inputActivo = null;
+
+    function mayorDivMenor10(n) {
+      for (let i = 9; i >= 2; i--) {
+        if (n % i === 0) return i;
+      }
+      return n;
+    }
+
+    function agregarNumero(numero) {
+      if (inputActivo) {
+        inputActivo.value += numero;
+      }
+    }
+
+    function confirmarNumero() {
+      if (inputActivo) {
+        const event = new Event('change');
+        inputActivo.dispatchEvent(event);
+      }
+    }
+
+    function borrarUltimo() {
+      if (inputActivo && inputActivo.value.length > 0) {
+        inputActivo.value = inputActivo.value.slice(0, -1);
+      }
+    }
+
+    function ajustarEspacioParaTeclado() {
+      const tabla = document.getElementById('tablaJuego');
+      const alturaTabla = tabla.offsetHeight;
+      const alturaVentana = window.innerHeight;
+      if (alturaTabla + 200 > alturaVentana) {
+        document.body.style.paddingBottom = '16em';
+      }
+    }
+
+    function iniciarJuego() {
+      const tabla = document.getElementById("tablaJuego");
+      const botonReiniciar = document.getElementById("reiniciar");
+      let numero = numerosValidos[Math.floor(Math.random() * numerosValidos.length)];
+      let filaIndex = 0;
+
+      function agregarFila(numeroActual) {
+        const divisor = mayorDivMenor10(numeroActual);
+        const resultado = numeroActual / divisor;
+        const tr = document.createElement("tr");
+        tr.id = `fila_${filaIndex}`;
+
+        const tdNumero = document.createElement("td");
+        tdNumero.id = `D1_${filaIndex}`;
+        tdNumero.className = "td-dividendo";
+        tdNumero.textContent = numeroActual;
+
+        const tdSep = document.createElement("td");
+        tdSep.textContent = ":";
+
+        const tdDivisor = document.createElement("td");
+        tdDivisor.id = `D2_${filaIndex}`;
+        tdDivisor.textContent = divisor;
+
+        const tdIgual = document.createElement("td");
+        tdIgual.textContent = "=";
+
+        const tdInput = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "text"; // Para evitar teclado numérico automático
+        input.inputMode = "none"; // Desactiva teclado virtual
+        input.id = `C1_${filaIndex}`;
+        input.maxLength = 6;
+
+        input.addEventListener("focus", function() {
+          inputActivo = this;
+        });
+
+        input.addEventListener("change", function () {
+          const valor = parseInt(this.value);
+          if (valor === resultado) {
+            this.classList.remove("input-rojo");
+            this.disabled = true;
+            filaIndex++;
+            if (resultado > 1) {
+              agregarFila(resultado);
+            } else {
+              tabla.classList.add("fondo-celebracion");
+              botonReiniciar.style.display = "inline-block";
+            }
+          } else {
+            this.classList.add("input-rojo");
+            setTimeout(() => {
+              this.classList.remove("input-rojo");
+              this.value = "";
+            }, 500);
+          }
+        });
+
+        tdInput.appendChild(input);
+        tr.appendChild(tdNumero);
+        tr.appendChild(tdSep);
+        tr.appendChild(tdDivisor);
+        tr.appendChild(tdIgual);
+        tr.appendChild(tdInput);
+        tabla.appendChild(tr);
+
+        input.focus();
+
+        // Scroll automático
+        setTimeout(() => {
+  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Asegura un pequeño desplazamiento adicional por si el teclado tapa
+  window.scrollBy(0, -100);
+}, 300);
+
+
+        // Ajusta padding si hace falta más espacio
+        ajustarEspacioParaTeclado();
+      }
+
+      agregarFila(numero);
+    }
+
+    iniciarJuego();
+  </script>
+</body>
+</html>

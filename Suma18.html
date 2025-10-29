@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Sumar 18</title>
+  <meta name="language" content="es">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+<style>
+  body {
+      margin: 1em;
+      background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+      text-align: center;
+      font-family:  "Verdana",Sanserif;;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      margin-top: 3em;
+      border: 3px solid black;
+      background-color: antiquewhite;
+    }
+    td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.5em;
+      border: 2px solid black;
+      font-size: 3em;
+      width: 1.75em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    td.player {
+      background-color: royalblue;
+      color: white;
+    }
+    td.computer {
+      background-color: mediumseagreen;
+      color: white;
+    }
+    #resultado {
+      margin-top: 1em;
+      font-size: 2em;
+      color: black;
+    }
+    #reiniciar {
+      margin-top: 1em;
+      font-size: 1em;
+      padding: 0.5em 1em;
+      cursor: pointer;
+    }
+    #btnImagen {
+  width: 60px;
+  height: 60px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  #btnImagen {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Móvil */
+@media (max-width: 600px) {
+  #btnImagen {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+  </style>
+</head>
+<body>
+    <table id="tabla">
+    <tr>
+      <td colspan="2">1</td><td colspan="2">2</td><td colspan="2">3</td>
+    </tr>
+    <tr>
+      <td colspan="2">4</td><td colspan="2">5</td><td colspan="2">6</td>
+    </tr>
+    <tr>
+      <td colspan="2">7</td><td colspan="2">8</td><td colspan="2">9</td>
+    </tr>
+    <tr>
+      <td colspan="3">10</td><td colspan="3">11</td>
+    </tr>
+  </table>
+
+  <div id="resultado"></div>
+  <button id="reiniciar" onclick="reiniciarJuego()" style="display:none; background:none; border:none; cursor:pointer;">
+  <img src="Imagenes/jugar2.png" alt="Reiniciar" id="btnImagen" />
+</button>
+
+
+<script>
+const celdas = document.querySelectorAll("td");
+const resultado = document.getElementById("resultado");
+
+let jugadorSeleccion = [];
+let maquinaSeleccion = [];
+let turnoInicial = "jugador";
+let turno = turnoInicial;
+
+const combinacionesGanadoras = [
+  [1, 6, 11], [1, 7, 10], [1, 8, 9], [2, 5, 11], [2, 6, 10],
+  [2, 7, 9], [3, 4, 11], [3, 5, 10], [3, 6, 9], [3, 7, 8],
+  [4, 5, 9], [4, 6, 8], [5, 6, 7]
+];
+
+const versatilidad = {};
+combinacionesGanadoras.forEach(comb => comb.forEach(n => {
+  versatilidad[n] = (versatilidad[n] || 0) + 1;
+}));
+
+celdas.forEach(celda => {
+  celda.addEventListener("click", () => {
+    if (resultado.textContent !== "" || turno !== "jugador") return;
+
+    const valor = parseInt(celda.textContent);
+    if (isNaN(valor) || celda.classList.contains("computer")) return;
+
+    if (celda.classList.contains("player")) {
+      jugadorSeleccion = jugadorSeleccion.filter(obj => obj.celda !== celda);
+      celda.classList.remove("player");
+    } else {
+      if (jugadorSeleccion.length >= 3) {
+        alert("Solo puedes tener 3 números seleccionados.");
+        return;
+      }
+      jugadorSeleccion.push({ celda, valor });
+      celda.classList.add("player");
+
+      if (jugadorSeleccion.length === 3 && suma(jugadorSeleccion) === 18) {
+        resultado.textContent = "¡Tú ganas!";
+        document.getElementById("reiniciar").style.display = "inline";
+        return;
+      }
+
+      turno = "maquina";
+      setTimeout(turnoMaquina, 400);
+    }
+  });
+});
+
+function suma(seleccion) {
+  return seleccion.reduce((acc, obj) => acc + obj.valor, 0);
+}
+
+function getDisponibles() {
+  return Array.from(celdas).filter(c =>
+    !c.classList.contains("player") &&
+    !c.classList.contains("computer")
+  ).map(c => ({ celda: c, valor: parseInt(c.textContent) }));
+}
+
+function puedeJugadorGanarCon(disponibles, jugador) {
+  const jugadorValores = jugador.map(o => o.valor);
+  if (jugadorValores.length === 2) {
+    const sumaJugador = jugadorValores[0] + jugadorValores[1];
+    for (const d of disponibles) {
+      if (sumaJugador + d.valor === 18) {
+        return d;
+      }
+    }
+  }
+  if (jugadorValores.length === 3) {
+    for (let i = 0; i < 3; i++) {
+      const pareja = jugadorValores.filter((_, idx) => idx !== i);
+      for (const d of disponibles) {
+        if (pareja[0] + pareja[1] + d.valor === 18) {
+          return d;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// NUEVA FUNCIÓN: valida que la jugada no lleve a derrota forzosa
+function jugadaSegura(candidato, jugador, maquina, disponibles) {
+  const nuevasDisponibles = disponibles.filter(d => d.valor !== candidato.valor);
+  const nuevoMaquina = maquina.concat([candidato]);
+
+  // Simulamos todas las posibles respuestas del jugador
+  for (const r of nuevasDisponibles) {
+    const nuevoJugador = jugador.concat([r]);
+    const nuevasDisponibles2 = nuevasDisponibles.filter(d => d.valor !== r.valor);
+
+    let tieneCamino = false;
+    for (const comb of combinacionesGanadoras) {
+      const inter = comb.filter(v => nuevoMaquina.some(m => m.valor === v));
+      if (inter.length > 0) {
+        const faltan = comb.filter(v => !nuevoMaquina.some(m => m.valor === v));
+        // ✅ fix: los faltantes deben estar libres y NO ser del jugador
+        if (
+          faltan.every(v =>
+            nuevasDisponibles2.some(d => d.valor === v) &&
+            !nuevoJugador.some(j => j.valor === v)
+          )
+        ) {
+          tieneCamino = true;
+          break;
+        }
+      }
+    }
+
+    if (!tieneCamino) return false; // esta respuesta del jugador bloquea todo
+  }
+  return true; // hay al menos un camino no condenado
+}
+
+function turnoMaquina() {
+  if (resultado.textContent !== "") return;
+
+  const disponibles = getDisponibles();
+  const maquinaValores = maquinaSeleccion.map(o => o.valor);
+
+  let mejor = null;
+  let mejorScore = -Infinity;
+
+  // 1. Intentar ganar ya
+  for (const d of disponibles) {
+    if (maquinaSeleccion.length < 3) {
+      const prueba = maquinaValores.concat(d.valor);
+      if (prueba.length === 3 && prueba.reduce((a, b) => a + b, 0) === 18) {
+        mejor = d;
+        break;
+      }
+    } else {
+      for (let i = 0; i < 3; i++) {
+        const prueba = maquinaValores.slice();
+        prueba[i] = d.valor;
+        if (prueba.reduce((a, b) => a + b, 0) === 18) {
+          mejor = d;
+          mejor.reemplazarIndex = i;
+          break;
+        }
+      }
+      if (mejor) break;
+    }
+  }
+
+  // 2. Bloquear al jugador si puede ganar
+  if (!mejor) {
+    const amenaza = puedeJugadorGanarCon(disponibles, jugadorSeleccion);
+    if (amenaza) {
+      mejor = amenaza;
+    }
+  }
+
+  // 3. Buscar jugada segura
+  if (!mejor) {
+    for (const d of disponibles) {
+      if (jugadaSegura(d, jugadorSeleccion, maquinaSeleccion, disponibles)) {
+        let score = versatilidad[d.valor] || 0;
+        score += Math.random();
+        if (score > mejorScore) {
+          mejor = d;
+          mejorScore = score;
+        }
+      }
+    }
+  }
+
+  // 4. Si no hay seguras, elegir la menos mala
+  if (!mejor && disponibles.length > 0) {
+    mejor = disponibles[Math.floor(Math.random() * disponibles.length)];
+  }
+
+  if (mejor) {
+    if (maquinaSeleccion.length === 3) {
+      let indexAEliminar = 0;
+      if (mejor.reemplazarIndex !== undefined) {
+        indexAEliminar = mejor.reemplazarIndex;
+      } else {
+        let minVersatilidad = Infinity;
+        maquinaSeleccion.forEach((obj, i) => {
+          const v = versatilidad[obj.valor] || 0;
+          if (v < minVersatilidad) {
+            minVersatilidad = v;
+            indexAEliminar = i;
+          }
+        });
+      }
+
+      const reemplazo = maquinaSeleccion[indexAEliminar];
+      reemplazo.celda.classList.remove("computer");
+      maquinaSeleccion.splice(indexAEliminar, 1);
+    }
+
+    mejor.celda.classList.add("computer");
+    maquinaSeleccion.push(mejor);
+
+    if (maquinaSeleccion.length === 3 && suma(maquinaSeleccion) === 18) {
+      resultado.textContent = "¡Gana la máquina!";
+      document.getElementById("reiniciar").style.display = "inline";
+      return;
+    }
+  }
+
+  turno = "jugador";
+}
+
+function reiniciarJuego() {
+  document.getElementById("reiniciar").style.display = "none";
+  jugadorSeleccion = [];
+  maquinaSeleccion = [];
+  resultado.textContent = "";
+  celdas.forEach(c => c.classList.remove("player", "computer"));
+
+  turnoInicial = (turnoInicial === "jugador") ? "maquina" : "jugador";
+  turno = turnoInicial;
+
+  if (turno === "maquina") {
+    setTimeout(turnoMaquina, 500);
+  }
+}
+
+if (turno === "maquina") {
+  setTimeout(turnoMaquina, 500);
+}
+</script>
+</body>
+</html>

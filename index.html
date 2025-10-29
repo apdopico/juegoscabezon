@@ -1,0 +1,440 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ActivaMente</title>
+  <meta name="description" content="Entrena tu memoria, cálculo y lógica con juegos cognitivos gratis. Mejora tu mente jugando en ActivaMente.">
+  <meta name="keywords" content="juegos cognitivos, entrenamiento mental, memoria, cálculo, ajedrez, crucigramas">
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <meta name="google-site-verification" content="JAlPBWYKB2XPbVJV3XvjRrfS-Ws2BklXfLd800Xnmh0" />
+  <style>
+   * {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #3d5c5c;
+  background-image: url("Imagenes/imagenFondo.png");
+  margin: 0;
+}
+
+#padre {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1400px;
+  background-color: #FAF0E6;
+  padding: 1rem;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 0.5rem;
+  font: 1.5em sans-serif;
+}
+
+header h1 {
+  display: flex;
+  align-items: center;
+  white-space: nowrap; /* evita salto de línea */
+  gap: 0.5rem; /* espacio entre texto e imagen */
+}
+
+/* 🔹 Grid adaptable automáticamente */
+section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.grid:hover {
+  transform: scale(1.03);
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+  transition: 0.2s ease-in-out;
+}
+
+.columna h2 {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.5em;
+  background-color: rgb(246, 139, 51);
+  color: white;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* Barra de navegación solo visible en móviles */
+.nav-categorias {
+  display: none; /* Oculta por defecto en pantallas grandes */
+}
+
+@media (max-width: 600px) {
+  .nav-categorias {
+    display: flex;
+    justify-content: center; /* centra los botones */
+    gap: 0.5rem;
+    background-color: rgb(246, 139, 51);
+    padding: 0.5rem 1rem;
+    border-radius: 17px;
+    margin-bottom: 1.5rem;
+  }
+
+  .nav-categorias a {
+    flex: 0 0 auto;
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease-in-out;
+    white-space: nowrap;
+  }
+
+  .nav-categorias a:hover {
+    background-color: rgb(230, 120, 30);
+  }
+
+  /* Ocultar encabezados de columna en móvil */
+  .columna h2 {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-categorias a {
+    font-size: 1.1em;
+    padding: 0.4rem 0.6rem;
+  }
+
+  header {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 0.5rem;
+    font: 1.2em sans-serif;
+  }
+
+  .T {
+    font-size: 1.1em;
+  }
+
+  .tex {
+    font-size: 0.95rem;
+    padding: 0.25rem;
+  }
+}
+
+.grid {
+  margin-bottom: 20px;
+  background-color: antiquewhite;
+  border-radius: 20px;
+  box-shadow: 1px 1px 1px rgb(146, 142, 142);
+  padding: 0.5rem;
+  height: 220px;
+}
+
+.T {
+  font: 1.3em sans-serif;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.cont {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+
+.vA {
+  height: 100px;
+  width: auto;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.tex {
+  font: 1.25rem sans-serif;
+  padding-right: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  display: block;
+}
+
+</style>
+
+</head>
+<body>
+  <div id="padre">
+    <header>
+      <h1>Juegos <img src="Imagenes/cabeza40.png"> Cabezón</h1>
+    </header>
+    
+    <!-- Barra de navegación -->
+    <nav class="nav-categorias">
+      <a href="#logica"> Lógica</a>
+      <a href="#memoria"> Memoria</a>
+      <a href="#calculo"> Cálculo</a>
+      <a href="#palabras"> Palabras</a>
+    </nav>
+    <section class="categorias">
+     <div class="columna" id="logica">
+     <h2>Juegos de Lógica</h2>
+     <a href="Ranas.html" target="_blank">
+        <div class="grid">
+          <p class="T">SALTO DE LA RANA</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/ranas4.png">
+            <div class="tex">
+              <p>Haz saltar las ranas para intercambiar las verdes por las marrones.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="Ranas2D.html" target="_blank">
+        <div class="grid">
+          <p class="T">RANAS EN 2D</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/Ranas2D.png">
+            <div class="tex">
+              <p>Saltan a la derecha y abajo y a la izquierda y arriba para intercambiar sus posiciones.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="Suma18.html" target="_blank">
+        <div class="grid">
+          <p class="T">SUMAR 18</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/suma18.png">
+            <div class="tex">
+              <p>Consigue sumar 18 con tres números antes de que lo haga la máquina.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="5enLinea.html" target="_blank">
+        <div class="grid">
+          <p class="T">CINCO EN LÍNEA</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/5enlinea.png">
+            <div class="tex">
+              <p>Coloca cinco en línea antes de que lo haga la máquina.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="Oso.html" target="_blank">
+        <div class="grid">
+          <p class="T">JUEGO DEL OSO</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/oso.png">
+            <div class="tex">
+              <p>Escribe OSO más veces que la máquina con la letra de cada turno.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="Ajedrez/Indice.html" target="_blank">
+        <div class="grid">
+          <p class="T">PROBLEMAS DE AJEDREZ</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/ajedrez.png">
+            <div class="tex">
+              <p>Problemas de<br>mate en dos y<br>mate en tres.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+     <div class="columna" id="memoria">
+     <h2>Juegos de Memoria</h2>
+      <a href="Matricula.html" target="_blank">
+        <div class="grid">
+          <p class="T">MATRÍCULA</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/matricula.png">
+            <div class="tex">
+              <p>Memoriza la matrícula para encontrarla entre las demás.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+
+       <a href="Telefonos.html" target="_blank">
+        <div class="grid">
+          <p class="T">TELÉFONOS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/telefonos.png">
+            <div class="tex">
+              <p>Memoriza los números de teléfono para poder <br> volver a llamar.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+
+       <a href="ColoresC.html" target="_blank">
+        <div class="grid">
+          <p class="T">COLORES CUADRADOS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/coloresC.png">
+            <div class="tex">
+              <p>Colorea igual los cuadrados en la misma posición.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+
+       <a href="Banderas.html" target="_blank">
+        <div class="grid">
+          <p class="T">BANDERAS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/banderas.png">
+            <div class="tex">
+              <p>Señala en la primera tabla qué bandera falta en la segunda.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+       <a href="CadaOveja.html" target="_blank">
+        <div class="grid">
+          <p class="T">CADA OVEJA</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/cadaO.png">
+            <div class="tex">
+              <p>Vuelve a colocar cada sombra con la misma cara del dado.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+        <a href="BaileFiguras.html" target="_blank">
+        <div class="grid">
+          <p class="T">BAILE DE FIGURAS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/Rv-P.png">
+            <div class="tex">
+              <p>Selecciona las cartas en el mismo orden en el que aparecieron en la secuencia.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+      </div>
+     
+      <div class="columna" id="calculo">
+       <h2>Juegos de Cálculo</h2>
+       <a href="Mas7.html" target="_blank">
+        <div class="grid">
+          <p class="T">MÁS 7</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/mas7.png">
+            <div class="tex">
+              <p>Completa la espiral sumando siete cada vez y mejora tu crono.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+
+       <a href="Menos7.html" target="_blank">
+        <div class="grid">
+          <p class="T">MENOS 7</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/menos7.png">
+            <div class="tex">
+              <p>Completa la espiral restando siete cada vez y mejora tu crono.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+
+       <a href="Contrarreloj.html" target="_blank">
+        <div class="grid">
+          <p class="T">CONTRARRELOJ</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/contrarreloj.png">
+            <div class="tex">
+              <p>Resuelve las operaciones antes de que se agote el tiempo.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+
+       <a href="DyV.html" target="_blank">
+        <div class="grid">
+          <p class="T">DIVIDE Y VENCERÁS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/DyV.png">
+            <div class="tex">
+              <p>Encadena divisiones sucesivas hasta llegar a uno.</p>
+            </div>
+          </div>
+        </div>
+       </a>
+      </div>
+
+   <div class="columna" id="palabras">
+    <h2>Juegos de Palabras</h2>
+    <a href="CdeL/Cruz de letras.html" target="_blank">
+        <div class="grid">
+          <p class="T">CRUZ DE LETRAS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/CdeL.png">
+            <div class="tex">
+              <p>Forma palabras y colócalas en el crucigrama.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <a href="PenC/Palabras en cruz.html" target="_blank">
+        <div class="grid">
+          <p class="T">PALABRAS EN CRUZ</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/pc.png">
+            <div class="tex">
+              <p>Combina las letras y completa el crucigrama.</p>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <a href="Sopas/Indice.html" target="_blank">
+        <div class="grid">
+          <p class="T">SOPA DE LETRAS</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/Sopa.png">
+            <div class="tex">
+              <p>Combina las letras y encuentra todas las palabras posibles.</p>
+            </div>
+          </div>
+        </div>
+      </a> 
+      <a href="EmpiezaX/Empieza por.html" target="_blank">
+        <div class="grid">
+          <p class="T">EMPIEZA POR...</p>
+          <div class="cont">
+            <img class="vA" src="Imagenes/empiezaX.png">
+            <div class="tex">
+              <p>Debes formar una palabra empezando con la letra central y usando todas las demás.</p>
+            </div>
+          </div>
+        </div>
+      </a>   
+   </div>
+ </section>
+</div>
+</body>
+</html>

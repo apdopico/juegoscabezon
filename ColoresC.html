@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Colores cuadrados</title>
+  <meta name="language" content="es">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+  <style>
+    body {
+      position: relative;
+      max-width: 30em;
+      background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+      margin: 0 auto;
+      text-align: center;
+    }
+    table {
+      margin-top: 5em;
+      margin-bottom: 4em;
+      margin-left: auto;
+      margin-right: auto;
+      border-collapse: collapse;
+    }
+    #colores {
+      background-color: white;
+      width: 24em;                
+      margin-left: auto;
+      margin-right: auto;
+      border: solid 1px black;
+      margin-top: 1em;
+      margin-bottom: 3em;
+      display: flex;
+      justify-content: space-evenly; 
+      align-items: center;
+      padding: 0.7em 0;             
+    }
+    .btn-color {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;           /* botón circular */
+  border: 4px solid #555;       /* borde del bote */
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.3); /* sombra interna simulando profundidad */
+  cursor: pointer;
+  transition: transform 0.2s;
+  background-clip: padding-box;
+  position: relative;
+}
+
+/* efecto de pintura líquida dentro */
+.btn-color::after {
+  content: '';
+  position: absolute;
+  top: 6px; bottom: 6px; left: 6px; right: 6px;
+  border-radius: 50%;
+  background-color: inherit; /* mismo color que el botón */
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.4); /* brillo simulando líquido */
+}
+
+    .btn-color:hover { transform: scale(1.1); }
+    .amarillo { background-color: #FFD700; }
+    .azul { background-color: #1E90FF; }
+    .rojo { background-color: #FF4500; }
+    .verde { background-color: #32CD32; }
+    .marron { background-color: #804000; }
+    button {
+      width: 9.5em;
+      height: 9.5em;
+      background-color: white;
+      border: 2px solid #000;
+    }
+    #bien {position: absolute; left: 8.3em; visibility: hidden; }
+    #mal {position: absolute; left: 18.3em; visibility: hidden; }
+    #juega {position: absolute; left: 13.3em; visibility: visible; }
+    #comprobar {position: absolute; left: 13.3em; visibility: hidden; }
+    @media screen and (max-width: 600px) {
+      body {
+        max-width: 22.5em;
+        width: 100%;
+        margin: 0 auto;
+        font-size: 0.75em;
+      }
+      table {
+        margin-top: 3.75em;
+        margin-bottom: 3em;
+      }
+      #colores {
+        width: 18em;
+        margin-top: 0.75em;
+        margin-bottom: 2.25em;
+      }
+      button {
+        width: 7.125em;
+        height: 7.125em;
+        border-width: 1.5px;
+      }
+      #bien, #mal, #juega, #comprobar {
+        max-width: 3em;
+        height: auto;
+        position: absolute;
+      }
+      #bien { left: 5.5em; }
+      #mal { left: 15em; }
+      #juega, #comprobar { left: 10em; }
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td><button id="1" onclick="pintar(this)"></button></td>
+      <td><button id="2" onclick="pintar(this)"></button></td>
+      <td><button id="3" onclick="pintar(this)"></button></td>
+    </tr>
+    <tr>
+      <td><button id="4" onclick="pintar(this)"></button></td>
+      <td><button id="5" onclick="pintar(this)"></button></td>
+      <td><button id="6" onclick="pintar(this)"></button></td>
+    </tr>
+    <tr>
+      <td><button id="7" onclick="pintar(this)"></button></td>
+      <td><button id="8" onclick="pintar(this)"></button></td>
+      <td><button id="9" onclick="pintar(this)"></button></td>
+    </tr>
+  </table> 
+
+  <div id="colores">
+    <button class="btn-color amarillo" onclick="colorAm()"></button>
+    <button class="btn-color azul" onclick="colorAz()"></button>
+    <button class="btn-color rojo" onclick="colorR()"></button>
+    <button class="btn-color verde" onclick="colorV()"></button>
+    <button class="btn-color marron" onclick="colorM()"></button>
+  </div>
+
+  <div>
+    <img id="bien" src="Imagenes/bienPulgar.png"/>
+    <img id="juega" src="Imagenes/jugar1.png" onclick="jugar()"/>
+    <img id="comprobar" src="Imagenes/comprobar.png" onclick="probar()"/>
+    <img id="mal" src="Imagenes/malPulgar.png"/>
+  </div>
+
+  <script>
+    var n1, n2, n3, n4, n5;
+    var color;
+    var amarillo, azul, rojo, verde, marron;
+
+    juega.style.visibility = "visible";
+    comprobar.style.visibility = "hidden";
+    bien.style.visibility = "hidden";
+    mal.style.visibility = "hidden";
+
+    function jugar() {
+      juega.style.visibility = "hidden";
+      comprobar.style.visibility = "visible";
+
+      let nums = "123456789".split('');
+      nums = nums.sort(() => Math.random() - 0.5).slice(0, 5);
+      [n1, n2, n3, n4, n5] = nums;
+
+      document.getElementById(n1).style.backgroundColor = '#fbd503'; // amarillo
+      document.getElementById(n2).style.backgroundColor = '#3cabe3'; // azul
+      document.getElementById(n3).style.backgroundColor = '#ea0106'; // rojo
+      document.getElementById(n4).style.backgroundColor = '#43cd18'; // verde
+      document.getElementById(n5).style.backgroundColor = '#804000'; // marrón
+
+      setTimeout(blanquear, 4000);
+    }
+
+    function blanquear() {
+      for (let i = 1; i <= 9; i++) {
+        document.getElementById(i).style.backgroundColor = 'white';
+      }
+    }
+
+    function colorAm() { color = "#fbd503"; }
+    function colorAz() { color = "#3cabe3"; }
+    function colorR() { color = "#ea0106"; }
+    function colorV() { color = "#43cd18"; }
+    function colorM() { color = "#804000"; }
+
+    function pintar(elementoActivo) {
+      if (!color) return;
+      elementoActivo.style.backgroundColor = color;
+
+      if (color === "#fbd503") amarillo = elementoActivo.id;
+      if (color === "#3cabe3") azul = elementoActivo.id;
+      if (color === "#ea0106") rojo = elementoActivo.id;
+      if (color === "#43cd18") verde = elementoActivo.id;
+      if (color === "#804000") marron = elementoActivo.id;
+    }
+
+    function probar() {
+      if (n1 === amarillo && n2 === azul && n3 === rojo && n4 === verde && n5 === marron) {
+        bien.style.visibility = "visible";
+      } else {
+        mal.style.visibility = "visible";
+      }
+      setTimeout(reiniciar, 3000);
+    }
+
+    function reiniciar() {
+      juega.style.visibility = "visible";
+      comprobar.style.visibility = "hidden";
+      bien.style.visibility = "hidden";
+      mal.style.visibility = "hidden";
+      blanquear();
+      amarillo = azul = rojo = verde = marron = undefined;
+    }
+  </script>
+</body>
+</html>
