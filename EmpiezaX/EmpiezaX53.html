@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<title>Empieza por C</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<link rel="icon" type="image/png" href="../../Imagenes/faviconCabeza.png"/>
+<style>
+  body {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    margin: 0;
+    padding-top: 2em;
+    background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+  position: relative;
+  width: 99vw;
+  max-width: 400px;
+  aspect-ratio: 1 / 1;
+  background-color: #d1d1e0;
+  border-radius: 50%;
+  margin-bottom: 2em;
+  }
+
+  .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    font-size: 2em;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+
+  .circle {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    font-size: 2em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .disabled {
+    background-color: #999999;
+    cursor: default;
+  }
+
+  #output {
+    width: 200px;
+    height: 50px;
+    background-color: #d1d1e0;
+    color: black;
+    padding: 0 1em;
+    font-size: 2em;
+    text-align: center;
+    border-radius: 25px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1em;
+  }
+
+  #navegar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    margin-top: 1em;
+  }
+
+  #reiniciar, #siguiente {
+    width: 50px;
+    height: 50px;
+    background-color: #d1d1e0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+    box-sizing: border-box;
+  }
+
+  #reiniciar:hover {
+    transform: rotate(90deg);
+  }
+
+  #siguiente:hover {
+    transform: translateX(5px);
+  }
+
+  #reiniciar svg, #siguiente svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  #resultado {
+    width: 50px;
+    height: 50px;
+    background-color: #d1d1e0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #resultado svg {
+    width: 70%;
+    height: 70%;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="center">C</div>
+  <div class="circle">F</div>
+  <div class="circle">U</div>
+  <div class="circle">E</div>
+  <div class="circle">L</div>
+  <div class="circle">M</div>
+  <div class="circle">A</div>
+</div>
+
+<div id="output"></div>
+
+<div id="navegar">
+  <button id="reiniciar" aria-label="Reiniciar">
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         viewBox="0 0 24 24" 
+         fill="none" stroke="black" stroke-width="2" 
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12a9 9 0 1 1-3-6.7"/>
+      <polyline points="21 3 21 9 15 9"/>
+    </svg>
+  </button>
+
+  <div id="resultado">
+    <!-- SVG dinámico -->
+  </div>
+
+  <button id="siguiente" aria-label="Siguiente">
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         viewBox="0 0 24 24" 
+         fill="none" stroke="black" stroke-width="2" 
+         stroke-linecap="round" stroke-linejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+      <polyline points="12 5 19 12 12 19"></polyline>
+    </svg>
+  </button>
+</div>
+
+<script>
+  const circles = document.querySelectorAll('.circle, .center');
+  const output = document.getElementById('output');
+  const radius = 150;
+  const reiniciarBtn = document.getElementById('reiniciar');
+  const siguienteBtn = document.getElementById('siguiente');
+  const resultado = document.getElementById('resultado');
+
+  // Distribución radial
+  const radialCircles = document.querySelectorAll('.circle');
+  radialCircles.forEach((circle, index) => {
+    const angle = (index / radialCircles.length) * 2 * Math.PI;
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    circle.style.left = '50%';
+    circle.style.top = '50%';
+    circle.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+  });
+
+  let selectedLetters = '';
+
+  // Manejar clic en letras
+  function handleClick(circle) {
+    if (!circle.classList.contains('disabled')) {
+      selectedLetters += circle.textContent;
+      circle.classList.add('disabled');
+      output.textContent = selectedLetters;
+
+      if (selectedLetters.length === 7) {
+        if (selectedLetters === 'CAMUFLE') {
+            resultado.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 viewBox="0 0 24 24" 
+                 fill="none" stroke="white" stroke-width="3" 
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>`;
+        } else {
+          resultado.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 viewBox="0 0 24 24" 
+                 fill="none" stroke="black" stroke-width="3" 
+                 stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>`;
+        }
+      }
+    }
+  }
+
+  circles.forEach(circle => {
+    circle.addEventListener('click', () => handleClick(circle));
+  });
+
+    reiniciarBtn.addEventListener('click', () => {
+    selectedLetters = '';
+    output.textContent = '';
+    resultado.innerHTML = '';
+    circles.forEach(circle => circle.classList.remove('disabled'));
+  });
+
+    siguienteBtn.addEventListener('click', () => {
+    window.location.href = "EmpiezaX54.html";
+  });
+
+</script>
+</body>
+</html>
