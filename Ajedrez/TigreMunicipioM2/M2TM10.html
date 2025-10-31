@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>M2TM10</title>
+  <meta name="language" content="es">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="icon" type="image/png" href="../../Imagenes/faviconCabeza.png"/>
+  <!-- CSS de chessboard.js -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+
+<style>
+ * {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  background-color:  #3d5c5c;background-image: url("../../Imagenes/imagenFondo.png");
+  margin-top: 5em;
+  font-size: clamp(16px, 4vw, 22px);
+}
+
+#turno {
+  margin-bottom: 1em;
+  font-size: clamp(1.5em, 5vw, 2.5em);
+}
+
+#board-container {
+  position: relative;
+  width: 90vw;
+  max-width: 500px;
+}
+
+#board {
+  width: 90vw;
+  max-width: 500px;
+  aspect-ratio: 1/1;        /* espacio reservado desde el inicio */
+  background-color: #f0d9b5; /* color casilla clara para evitar “hueco vacío” */
+  margin-bottom: 2em;
+}
+
+#message {
+  position: absolute;
+  top: 46.25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: black;
+  font-size: clamp(2em, 6vw, 3.5em);
+  display: none;
+  z-index: 10;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  body {
+    margin-top: 3em;
+  }
+  #board {
+    width: 95vw;
+    max-width: 95vw;
+  }
+  #board-container {
+    width: 95vw;
+    max-width: 95vw;
+  }
+  div[style*="display: flex"] img {
+    width: clamp(2em, 6vw, 3em);
+    height: auto;
+    margin: 0 0.5em;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: portrait) {
+  #board-container,
+  #board {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 95vw;
+    max-width: 95vw;
+  }
+}
+</style>
+</head>
+<body>
+  <div id="turno">Juegan blancas</div>
+  <div id="board-container">
+    <div id="board"></div>
+    <div id="message"></div>
+  </div>
+  <div style="display: flex; align-items: center;">
+    <a href="#" onclick="location.reload(); return false;" style="margin-right: 2em;">
+      <img src="../../Imagenes/reiniciar2.png" style="cursor: pointer; max-width: 100%; height: auto;">
+    </a>
+    <a href="M2TM11.html">
+      <img src="../../Imagenes/siguiente1.png" style="cursor: pointer; max-width: 100%; height: auto;">
+    </a>
+  </div>
+
+ <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- chess.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+<!-- chessboard.js -->
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+<!-- stockfish.js -->
+<script src="../stockfish.js" defer></script>
+
+<script>
+  const game = new Chess();
+  let stockfish = null; // motor se cargará después
+
+  // tablero se pinta INMEDIATAMENTE
+  const board = Chessboard('board', {
+    draggable: true,
+    responsive: true,
+    showNotation: false,
+    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+
+    onDragStart: function (source, piece) {
+      if (
+        game.game_over() ||
+        (game.turn() === 'w' && piece.startsWith('b')) ||
+        (game.turn() === 'b' && piece.startsWith('w'))
+      ) {
+        return false;
+      }
+    },
+
+    onDrop: function (source, target) {
+      const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q'
+      });
+
+      if (move === null) return 'snapback';
+
+      board.position(game.fen());
+
+      if (game.in_checkmate()) {
+        showMessage("¡Jaque mate!");
+      } else {
+        setTimeout(makeComputerMove, 300);
+      }
+    }
+  });
+
+  function showMessage(txt) {
+    const msg = document.getElementById("message");
+    msg.innerHTML = `<div>${txt}</div>`;
+    msg.style.display = "block";
+  }
+
+  // carga la posición inicial
+  function loadInitialPosition() {
+    const fen = "r4R2/1b2n1pp/p2Np1k1/1pn5/4pP1P/8/PPP1B1P1/2K4R w - - 0 1";
+    game.load(fen);
+    board.position(fen);
+    showMessage(""); // limpia
+    document.getElementById("message").style.display = "none";
+  }
+  loadInitialPosition();
+
+  // inicializa Stockfish solo cuando la página ya cargó
+  window.addEventListener("load", () => {
+    initEngine();
+  });
+
+  function initEngine() {
+    if (stockfish) return; // ya está
+    if (typeof STOCKFISH === "function") {
+      stockfish = STOCKFISH(); // versión JS
+    } else {
+      stockfish = new Worker("../stockfish.js"); // versión worker
+    }
+
+    stockfish.onmessage = function (event) {
+      const line = event.data;
+      console.log("Stockfish:", line);
+
+      if (line.startsWith("bestmove")) {
+        const move = line.split(" ")[1];
+        if (move && move !== "(none)") {
+          game.move(move, { sloppy: true });
+          board.position(game.fen());
+          if (game.in_checkmate()) showMessage("¡Jaque mate!");
+        }
+      }
+    };
+  }
+
+  function sendToEngine(cmd) {
+    if (!stockfish) initEngine();
+    stockfish.postMessage(cmd);
+  }
+
+  function makeComputerMove() {
+    if (game.game_over()) return;
+    initEngine();
+    const fen = game.fen();
+    sendToEngine("position fen " + fen);
+    sendToEngine("go depth 12");
+  }
+</script>
+</body>
+</html>

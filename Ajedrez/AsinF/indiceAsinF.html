@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajedrez sin fronteras</title>
+  <link rel="icon" type="image/png" href="../../Imagenes/faviconCabeza.png"/>
+  <style>
+ body {
+  text-align: center;
+  background-color:  #3d5c5c;background-image: url("../../Imagenes/imagenFondo.png");
+  font-family: Verdana, sans-serif;
+  font-size: 1.5em;
+  padding: 1em;
+}
+
+h1 {
+  margin-bottom: 1em;
+  font-size: 1.65em;
+}
+
+.contenedor-scroll {
+  overflow-x: auto;
+  padding: 1em;
+  background-color: white;
+  border-radius: 10px;
+  display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.grid-10 {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr); /* Máx 8 columnas en escritorio */
+  gap: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.grid-10 a {
+  display: block;
+  padding: 0.5em;
+  border: 1px solid #000;
+  background-color: #f0f0f0;
+  color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.grid-10 a:hover {
+  background-color: #ddd;
+}
+
+footer {
+  margin-top: 2em;
+  font-size: 0.7em;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 1.125em;
+    padding: 0.75em;
+  }
+
+  h1 {
+    font-size: 1.5em;
+    margin-bottom: 0.85em;
+  }
+
+  .grid-10 {
+    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); 
+    /* Auto-ajusta columnas sin que se ensanche solo una */
+    max-width: calc(35px * 10); /* No más de 10 columnas */
+    margin: 0 auto; /* Centrar si hay espacio */
+  }
+
+  .grid-10 a {
+    padding: 0.375em;
+    font-size: 0.9em;
+  }
+
+  footer {
+    font-size: 0.525em;
+    margin-top: 1.3em;
+  }
+}
+
+</style>
+
+</head>
+<body>
+  <h1>AJEDREZ SIN FRONTERAS</h1>
+
+  <div class="contenedor-scroll">
+    <div class="grid-10">
+      <a href="AsinF1.html" target="_blank">1</a>
+      <a href="AsinF2.html" target="_blank">2</a>
+      <a href="AsinF3.html" target="_blank">3</a>
+      <a href="AsinF4.html" target="_blank">4</a>
+      <a href="AsinF5.html" target="_blank">5</a>
+      <a href="AsinF6.html" target="_blank">6</a>
+      <a href="AsinF7.html" target="_blank">7</a>
+      <a href="AsinF8.html" target="_blank">8</a>
+      <a href="AsinF9.html" target="_blank">9</a>
+      <a href="AsinF10.html" target="_blank">10</a>
+      <a href="AsinF11.html" target="_blank">11</a>
+      <a href="AsinF12.html" target="_blank">12</a>
+      <a href="AsinF13.html" target="_blank">13</a>
+      <a href="AsinF14.html" target="_blank">14</a>
+      <a href="AsinF15.html" target="_blank">15</a>
+      <a href="AsinF16.html" target="_blank">16</a>
+      <a href="AsinF17.html" target="_blank">17</a>
+      <a href="AsinF18.html" target="_blank">18</a>
+      <a href="AsinF19.html" target="_blank">19</a>
+      <a href="AsinF20.html" target="_blank">20</a>
+      <a href="AsinF21.html" target="_blank">21</a>
+      <a href="AsinF22.html" target="_blank">22</a>
+      <a href="AsinF23.html" target="_blank">23</a>
+      <a href="AsinF24.html" target="_blank">24</a>
+      
+    </div>
+  </div>
+
+  <footer>
+    "JAQUE MATE EN DOS JUGADAS" www.ajedrezsinfronteras.com
+  </footer>
+</body>
+</html>
