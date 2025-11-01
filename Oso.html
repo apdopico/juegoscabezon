@@ -48,12 +48,35 @@ body {
   color: white;
 }
 
-/* 🔹 Marcador */
 .score {
   margin-top: 20px;
   font-size: 18px;
+  display: flex;
+  justify-content: center;
 }
 
+.score table {
+  border-collapse: collapse;
+  background-color: antiquewhite;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.score td {
+  padding: 8px 16px;
+  border: 1px solid #444;
+}
+
+.score td:nth-child(2) {
+  width: 30px;      
+  text-align: center;
+}
+.crown {
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  margin-top: 4px;
+}
 /* 🔹 Versión escritorio */
 @media (min-width: 600px) {
   .board {
@@ -74,12 +97,31 @@ body {
 <body>
   <div class="board" id="board"></div>
   <div class="score">
-    Turno de: <span id="turn">Jugador</span><br />
-    Letra actual: <strong id="selectedLetter">O</strong><br />
-    Puntuación - Jugador: <span id="score1">0</span> | IA: <span id="score2">0</span>
-  </div>
+  <span id="turn" style="display:none;">Jugador</span>
 
-  <script>
+  <table>
+    <tr>
+      <td><strong>Letra</strong></td>
+      <td><span id="selectedLetter">O</span></td>
+    </tr>
+    <tr id="rowJugador">
+      <td>
+        <strong>Jugador</strong><br>
+        <span id="crownJugador" class="crown"></span>
+      </td>
+      <td><span id="score1">0</span></td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Máquina</strong><br>
+        <span id="crownIA" class="crown"></span>
+      </td>
+      <td><span id="score2">0</span></td>
+    </tr>
+  </table>
+</div>
+
+<script>
     const size = 7;
     const board = document.getElementById('board');
     const turnDisplay = document.getElementById('turn');
@@ -366,18 +408,29 @@ body {
       return true;
     }
 
-    function showWinner() {
-      const message =
-        scores[0] > scores[1]
-          ? '¡Ganaste! 🎉'
-          : scores[1] > scores[0]
-          ? 'Ganó la IA 🤖'
-          : 'Empate 🤝';
-      setTimeout(() => alert(message), 300);
-    }
+  function showWinner() {
+  const crownJugador = document.getElementById('crownJugador');
+  const crownIA = document.getElementById('crownIA');
+
+  // Limpia coronas anteriores
+  crownJugador.textContent = '';
+  crownIA.textContent = '';
+
+  if (scores[0] > scores[1]) {
+    // 🏆 Gana jugador
+    crownJugador.textContent = '👑';
+  } else if (scores[1] > scores[0]) {
+    // 🏆 Gana IA
+    crownIA.textContent = '👑';
+  } else {
+    // 🤝 Empate → ambos con corona
+    crownJugador.textContent = '👑';
+    crownIA.textContent = '👑';
+  }
+}
 
     // iniciar tablero
-    createBoard();
-  </script>
+  createBoard();
+</script>
 </body>
 </html>
