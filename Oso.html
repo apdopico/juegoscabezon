@@ -7,18 +7,18 @@
   <link rel="icon" type="image/png" href="https://apdopico.github.io/juegoscabezon/Imagenes/faviconCabeza.png?v=3">
   <style>
 body {
-  background-color: #3d5c5c;background-image: url("../Imagenes/imagenFondo.png");
+  background-color: #3d5c5c;
+  background-image: url("../Imagenes/imagenFondo.png");
   font-family: sans-serif;
   text-align: center;
   margin-top: 40px;
 }
 
-/* 🔹 Tablero responsive */
+/* 🔹 Tablero */
 .board {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(7, 1fr);
-  gap: 0;
   margin: 0 auto;
   background-color: antiquewhite;
   width: 90vw;
@@ -26,11 +26,11 @@ body {
   aspect-ratio: 1 / 1;
 }
 
-/* 🔹 Celdas flexibles */
+/* 🔹 Celdas */
 .cell {
   width: 100%;
   height: 100%;
-  font-size: 5vw;
+  font-size: min(5vw, 28px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,6 +48,7 @@ body {
   color: white;
 }
 
+/* 🔹 Marcador */
 .score {
   margin-top: 20px;
   font-size: 18px;
@@ -63,81 +64,114 @@ body {
 }
 
 .score td {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: 1px solid #444;
-}
-
-.score td:nth-child(2) {
-  width: 30px;      
   text-align: center;
+  height: 30px;               /* 🔹 Altura uniforme */
+  vertical-align: middle;
 }
-.crown {
-  font-size: 24px;
-  line-height: 1;
-  display: inline-block;
-  margin-top: 4px;
-}
-/* 🔹 Versión escritorio */
-@media (min-width: 600px) {
-  .board {
-    width: fit-content;
-    aspect-ratio: auto;
-    grid-template-columns: repeat(7, 60px);
-    grid-template-rows: repeat(7, 60px);
-  }
 
-  .cell {
-    width: 60px;
-    height: 60px;
-    font-size: 32px;
-  }
+/* 🔹 Nombres con coronas */
+.cell-nombre {
+  position: relative;
+  text-align: left;
+  padding-left: 10px;
+  height: 1.8em;
+  overflow: hidden;
 }
-</style>
+
+/* 👑 Corona superpuesta sobre la palabra */
+.crown {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -55%) scale(0.7);
+  font-size: 1.4em;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.crown.visible {
+  opacity: 1;
+  transform: translate(-50%, -55%) scale(1);
+}
+
+/* 🔹 Botón de reinicio */
+.reiniciar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.reiniciar-btn:hover {
+  transform: scale(1.1);
+}
+
+.reiniciar-btn img {
+  width: 25px;   /* 🔹 Tamaño ajustado a la altura de la fila */
+  height: 25px;
+  object-fit: contain;
+}
+
+
+  </style>
 </head>
 <body>
   <div class="board" id="board"></div>
+
   <div class="score">
-  <span id="turn" style="display:none;">Jugador</span>
+    <table>
+      <tr>
+        <td>Letra</td>
+        <td><span id="selectedLetter" style="display:inline-block; width:1.5em; text-align:center;">O</span></td>
+      </tr>
+      <tr id="rowJugador">
+        <td class="cell-nombre">
+          <span id="crownJugador" class="crown"></span>
+          Jugador
+        </td>
+        <td><span id="score1">0</span></td>
+      </tr>
+      <tr>
+        <td class="cell-nombre">
+          <span id="crownIA" class="crown"></span>
+          Máquina
+        </td>
+        <td><span id="score2">0</span></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button class="reiniciar-btn" onclick="location.reload()">
+            <img src="https://apdopico.github.io/juegoscabezon/Imagenes/reiniciar2.png" alt="Reiniciar">
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
 
-  <table>
-    <tr>
-      <td><strong>Letra</strong></td>
-      <td><span id="selectedLetter">O</span></td>
-    </tr>
-    <tr id="rowJugador">
-      <td>
-        <strong>Jugador</strong><br>
-        <span id="crownJugador" class="crown"></span>
-      </td>
-      <td><span id="score1">0</span></td>
-    </tr>
-    <tr>
-      <td>
-        <strong>Máquina</strong><br>
-        <span id="crownIA" class="crown"></span>
-      </td>
-      <td><span id="score2">0</span></td>
-    </tr>
-  </table>
-</div>
-
-<script>
+  <script>
     const size = 7;
     const board = document.getElementById('board');
-    const turnDisplay = document.getElementById('turn');
     const selectedLetterDisplay = document.getElementById('selectedLetter');
     const score1Display = document.getElementById('score1');
     const score2Display = document.getElementById('score2');
 
-    // tablero: matriz [row][col], '' = vacío, 'O' o 'S'
     let grid = Array.from({length: size}, () => Array(size).fill(''));
-    let currentPlayer = 1; // 1 = humano, 2 = IA
-    let scores = [0, 0];   // [jugador, ia]
+    let currentPlayer = 1;
+    let scores = [0, 0];
     let turnCount = 0;
     let highlights = [];
 
     function getLetterForTurn(tc = turnCount) {
-      // Alterna O y S cada dos turnos: 0,1 = O; 2,3 = S; ...
       return Math.floor(tc / 2) % 2 === 0 ? 'O' : 'S';
     }
 
@@ -154,7 +188,6 @@ body {
           if (grid[row][col]) {
             cell.classList.add('filled');
           } else if (currentPlayer === 1) {
-            // usar onclick para reemplazar posible listener anterior
             cell.onclick = handleClick;
           } else {
             cell.onclick = null;
@@ -175,40 +208,30 @@ body {
 
       const letter = getLetterForTurn();
       grid[row][col] = letter;
-
       highlights = getOSOCoords(grid, row, col);
       const points = highlights.length / 3;
       scores[0] += points;
       updateScore();
-
       createBoard();
 
       if (points > 0) {
         setTimeout(() => {
           highlights = [];
           createBoard();
-          if (isGameOver()) {
-            showWinner();
-            return;
-          }
+          if (isGameOver()) return showWinner();
         }, 1000);
       } else {
         turnCount++;
         currentPlayer = 2;
-        turnDisplay.textContent = 'IA';
         setTimeout(() => {
           highlights = [];
           createBoard();
-          if (isGameOver()) {
-            showWinner();
-            return;
-          }
+          if (isGameOver()) return showWinner();
           aiMove();
         }, 300);
       }
     }
 
-    // --- IA ---
     function aiMove() {
       const letter = getLetterForTurn();
       let bestMove = null;
@@ -217,23 +240,14 @@ body {
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
           if (!grid[row][col]) {
-            // trabajar con copia para evaluar sin mutar el tablero real
             const testGrid = cloneGrid(grid);
             testGrid[row][col] = letter;
-
-            let offensive = countOSO(testGrid, row, col);          // puntos inmediatos
-            let defensive = evaluatePlayerThreatsFrom(testGrid);   // amenaza del jugador
+            let offensive = countOSO(testGrid, row, col);
+            let defensive = evaluatePlayerThreatsFrom(testGrid);
             let isolation = countAdjacentLettersOn(testGrid, row, col);
             let risk = simulatePlayerOSOAfterMoveOn(testGrid, row, col);
             let trap = simulateTrapOn(testGrid, row, col);
-
-            // Pesos: puedes ajustarlos
-            let score = offensive * 1000
-                      - defensive * 500
-                      - isolation * 50
-                      - risk * 1000
-                      + trap * 800;
-
+            let score = offensive * 1000 - defensive * 500 - isolation * 50 - risk * 1000 + trap * 800;
             if (score > maxScore) {
               maxScore = score;
               bestMove = { row, col };
@@ -242,15 +256,10 @@ body {
         }
       }
 
-      if (!bestMove) {
-        if (isGameOver()) showWinner();
-        return;
-      }
+      if (!bestMove) return isGameOver() && showWinner();
 
-      // ejecutar mejor jugada en tablero real
       const { row, col } = bestMove;
-      const playLetter = getLetterForTurn();
-      grid[row][col] = playLetter;
+      grid[row][col] = letter;
       highlights = getOSOCoords(grid, row, col);
       const points = highlights.length / 3;
       scores[1] += points;
@@ -261,37 +270,23 @@ body {
         setTimeout(() => {
           highlights = [];
           createBoard();
-          if (isGameOver()) {
-            showWinner();
-            return;
-          }
-          // IA sigue jugando si consigue puntos
+          if (isGameOver()) return showWinner();
           aiMove();
         }, 1000);
       } else {
         turnCount++;
         currentPlayer = 1;
-        turnDisplay.textContent = 'Jugador';
         highlights = [];
         createBoard();
         if (isGameOver()) showWinner();
       }
     }
 
-    // --- utilidades de simulación sin efectos secundarios ---
-    function cloneGrid(g) {
-      return g.map(row => row.slice());
-    }
-
-    // Cuenta cuántos OSO genera colocar en (row,col) sobre una grid dada
-    function countOSO(g, row, col) {
-      return getOSOCoords(g, row, col).length / 3;
-    }
+    const cloneGrid = g => g.map(r => r.slice());
+    const isInBounds = (r, c) => r >= 0 && r < size && c >= 0 && c < size;
 
     function getOSOCoords(g, row, col) {
-      const dirs = [
-        [0, 1], [1, 0], [1, 1], [1, -1]
-      ];
+      const dirs = [[0,1],[1,0],[1,1],[1,-1]];
       let found = [];
       for (const [dx, dy] of dirs) {
         for (let offset = -2; offset <= 0; offset++) {
@@ -301,136 +296,115 @@ body {
           const c2 = c1 + dy;
           const r3 = r2 + dx;
           const c3 = c2 + dy;
-
-          if (isInBounds(r1, c1) && isInBounds(r2, c2) && isInBounds(r3, c3)) {
-            const seq = (g[r1][c1] || '') + (g[r2][c2] || '') + (g[r3][c3] || '');
-            if (seq === 'OSO') {
-              found.push([r1, c1], [r2, c2], [r3, c3]);
-            }
+          if (isInBounds(r1,c1)&&isInBounds(r2,c2)&&isInBounds(r3,c3)) {
+            const seq = (g[r1][c1]||'')+(g[r2][c2]||'')+(g[r3][c3]||'');
+            if (seq==='OSO') found.push([r1,c1],[r2,c2],[r3,c3]);
           }
         }
       }
       return found;
     }
 
-    function isInBounds(r, c) {
-      return r >= 0 && r < size && c >= 0 && c < size;
-    }
+    const countOSO = (g,r,c)=>getOSOCoords(g,r,c).length/3;
 
-    function countAdjacentLettersOn(g, row, col) {
+    function countAdjacentLettersOn(g, r, c) {
       let count = 0;
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-          if (dx === 0 && dy === 0) continue;
-          const r = row + dx;
-          const c = col + dy;
-          if (isInBounds(r, c) && g[r][c]) count++;
+      for (let dx=-1;dx<=1;dx++){
+        for(let dy=-1;dy<=1;dy++){
+          if(dx||dy){
+            const rr=r+dx, cc=c+dy;
+            if(isInBounds(rr,cc)&&g[rr][cc]) count++;
+          }
         }
       }
       return count;
     }
 
-    // Evalúa cuántos OSO podría conseguir el jugador si jugara con su próxima letra (sobre una grid dada)
     function evaluatePlayerThreatsFrom(g) {
       const nextLetter = getLetterForTurn() === 'O' ? 'S' : 'O';
       let total = 0;
       const tg = cloneGrid(g);
-      for (let row = 0; row < size; row++) {
-        for (let col = 0; col < size; col++) {
-          if (!tg[row][col]) {
-            tg[row][col] = nextLetter;
-            total += countOSO(tg, row, col);
-            tg[row][col] = '';
+      for (let row=0;row<size;row++){
+        for(let col=0;col<size;col++){
+          if(!tg[row][col]){
+            tg[row][col]=nextLetter;
+            total+=countOSO(tg,row,col);
+            tg[row][col]='';
           }
         }
       }
       return total;
     }
 
-    // Simula que la IA juega en (rAI,cAI) (en la grid dada) y cuenta cuántos OSO podría crear después el jugador (riesgo)
     function simulatePlayerOSOAfterMoveOn(g, rAI, cAI) {
       const aiLetter = getLetterForTurn();
       const tg = cloneGrid(g);
-      tg[rAI][cAI] = aiLetter;
-      const nextLetter = aiLetter === 'O' ? 'S' : 'O';
-      let totalThreat = 0;
-      for (let row = 0; row < size; row++) {
-        for (let col = 0; col < size; col++) {
-          if (!tg[row][col]) {
-            tg[row][col] = nextLetter;
-            totalThreat += countOSO(tg, row, col);
-            tg[row][col] = '';
+      tg[rAI][cAI]=aiLetter;
+      const nextLetter = aiLetter==='O'?'S':'O';
+      let totalThreat=0;
+      for(let r=0;r<size;r++){
+        for(let c=0;c<size;c++){
+          if(!tg[r][c]){
+            tg[r][c]=nextLetter;
+            totalThreat+=countOSO(tg,r,c);
+            tg[r][c]='';
           }
         }
       }
       return totalThreat;
     }
 
-    // Nuevo: simula trampas que obliguen al jugador a crear OSO para la IA (sobre una grid dada)
-    function simulateTrapOn(g, rAI, cAI) {
-      const aiLetter = getLetterForTurn();
-      const tg = cloneGrid(g);
-      tg[rAI][cAI] = aiLetter;
-      const nextLetter = aiLetter === 'O' ? 'S' : 'O';
-      let forcedOSO = 0;
-
-      // Si al jugador no le quedaran movimientos "seguros" y algunos movimientos le generan OSO,
-      // eso es una trampa. Aquí sumamos los OSO que el jugador podría crear (lo usamos como premio).
-      for (let row = 0; row < size; row++) {
-        for (let col = 0; col < size; col++) {
-          if (!tg[row][col]) {
-            tg[row][col] = nextLetter;
-            let puntosJugador = countOSO(tg, row, col);
-            if (puntosJugador > 0) {
-              forcedOSO += puntosJugador;
-            }
-            tg[row][col] = '';
+    function simulateTrapOn(g,rAI,cAI){
+      const aiLetter=getLetterForTurn();
+      const tg=cloneGrid(g);
+      tg[rAI][cAI]=aiLetter;
+      const nextLetter=aiLetter==='O'?'S':'O';
+      let forcedOSO=0;
+      for(let r=0;r<size;r++){
+        for(let c=0;c<size;c++){
+          if(!tg[r][c]){
+            tg[r][c]=nextLetter;
+            let pts=countOSO(tg,r,c);
+            if(pts>0) forcedOSO+=pts;
+            tg[r][c]='';
           }
         }
       }
-
       return forcedOSO;
     }
 
-    // --- funciones auxiliares para el juego real ---
     function updateScore() {
-      // mostrar sin decimales si son enteros, o con 1 decimal si necesario
       score1Display.textContent = Number.isInteger(scores[0]) ? scores[0] : scores[0].toFixed(1);
       score2Display.textContent = Number.isInteger(scores[1]) ? scores[1] : scores[1].toFixed(1);
     }
 
     function isGameOver() {
-      for (let row = 0; row < size; row++) {
-        for (let col = 0; col < size; col++) {
-          if (!grid[row][col]) return false;
-        }
-      }
-      return true;
+      return grid.every(row => row.every(cell => cell));
     }
 
-  function showWinner() {
-  const crownJugador = document.getElementById('crownJugador');
-  const crownIA = document.getElementById('crownIA');
+    function showWinner() {
+      const crownJugador = document.getElementById('crownJugador');
+      const crownIA = document.getElementById('crownIA');
+      [crownJugador, crownIA].forEach(el => {
+        el.textContent = '';
+        el.classList.remove('visible');
+      });
 
-  // Limpia coronas anteriores
-  crownJugador.textContent = '';
-  crownIA.textContent = '';
+      if (scores[0] > scores[1]) {
+        crownJugador.textContent = '👑';
+        crownJugador.classList.add('visible');
+      } else if (scores[1] > scores[0]) {
+        crownIA.textContent = '👑';
+        crownIA.classList.add('visible');
+      } else {
+        crownJugador.textContent = '👑👑';
+        crownIA.textContent = '👑👑';
+        crownJugador.classList.add('visible');
+        crownIA.classList.add('visible');
+      }
+    }
 
-  if (scores[0] > scores[1]) {
-    // 🏆 Gana jugador
-    crownJugador.textContent = '👑';
-  } else if (scores[1] > scores[0]) {
-    // 🏆 Gana IA
-    crownIA.textContent = '👑';
-  } else {
-    // 🤝 Empate → ambos con corona
-    crownJugador.textContent = '👑';
-    crownIA.textContent = '👑';
-  }
-}
-
-    // iniciar tablero
-  createBoard();
-</script>
+    createBoard();
+  </script>
 </body>
 </html>
