@@ -1,0 +1,12 @@
+# Archivo robots.txt para juegoscabezon.online
+# Última actualización: 2025-11-04
+
+User-agent: *
+Allow: /
+
+# Evita indexar carpetas o archivos técnicos (si no deseas mostrarlos en Google)
+Disallow: /CNAME
+Disallow: /Imagenes/
+
+# Indica la ubicación del sitemap para mejorar el rastreo
+Sitemap: https://www.juegoscabezon.online/sitemap.xml
