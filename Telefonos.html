@@ -7,33 +7,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
 <style>
-  body {
-  padding-top: 2em;
+body {
+  margin: 0;
   background-color: #3d5c5c;
-  background-image: url("../Imagenes/imagenFondo.png"), url("Imagenes/movil.png");
-  background-repeat: repeat, no-repeat;      /* la textura se repite, el móvil no */
-  background-size: auto, auto;              /* la textura en tamaño real, el móvil sin escalar */
-  background-position: center, center 2em;  /* textura centrada, móvil centrado y bajado 2em */
-  font-family: "Verdana", sans-serif;
-  text-align: center;
-  }
+  background-image: url("../Imagenes/imagenFondo.png");
+  background-repeat: repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100svh; /* altura real útil en portátiles */
+}
+.phone {
+  background-image: url("Imagenes/movil.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: min(90vw, 380px); /* se adapta a pantalla */
+  height: 90svh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
   table{margin-top:5em;margin-left:auto;margin-right:auto;width:17em;height:30em;}
-  caption{height:2em;font-size:2.5em;}
+  caption{height:2em;font-size:3em;}
   td{padding-top:0.5em;}
   #botones{margin-top:2em;}
   button{width:1.5em;background-color:white;border-radius:50%;font-size:3em;cursor:pointer;}
   #bien{visibility:hidden;}
   #mal{visibility:hidden;}
   @media (max-height: 760px) {
-  body {
-    transform: scale(0.85);   /* tamaño reducido */
-    padding-top: 0;           /* ajustamos el espacio superior */
+  #page {
+    transform: scale(0.85);
+    padding-top: 0.5em;
   }
 }
   
 </style>
 </head>
 <body>
+  <div class="phone">
   <table>
     <caption id="texto"></caption>
     <tr><td><button id="1">1</button></td><td><button id="2">2</button></td><td><button id="3">3</button></td></tr>
@@ -42,6 +54,7 @@
     <tr><td></td><td><button id="0">0</button></td><td></td></tr>
     <tr id="botones"><td><img id="bien" src="Imagenes/bienVerde.png"/></td><td><img src="Imagenes/llamar.png" onclick="jugar()"/></td><td><img id="mal" src="Imagenes/malAspa.png"/></td></tr>
   </table>  
+  </div>
 </body>
 <script> 
   function jugar(){
