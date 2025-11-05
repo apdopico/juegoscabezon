@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
 <style>
   body {
-  margin-top: 2em;
+  padding-top: 2em;
   background-color: #3d5c5c;
   background-image: url("../Imagenes/imagenFondo.png"), url("Imagenes/movil.png");
   background-repeat: repeat, no-repeat;      /* la textura se repite, el móvil no */
@@ -17,7 +17,7 @@
   font-family: "Verdana", sans-serif;
   text-align: center;
   }
-  table{margin-top:7em;margin-left:auto;margin-right:auto;width:17em;height:30em;}
+  table{margin-top:5em;margin-left:auto;margin-right:auto;width:17em;height:30em;}
   caption{height:2em;font-size:2.5em;}
   td{padding-top:0.5em;}
   #botones{margin-top:2em;}
@@ -25,12 +25,12 @@
   #bien{visibility:hidden;}
   #mal{visibility:hidden;}
   @media (max-height: 800px) {
-    body{
-      zoom:90%;
-      margin-top: 1em;
-    }
-    table{margin-top:3em;}
+  body{
+    zoom:90%;
+    padding-top: 0.5em;
   }
+  table{margin-top:0.5em;}
+}
   @media only screen and (max-width:768px){body{zoom:90%;}}
 </style>
 </head>
