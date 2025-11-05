@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <title></title>
+  <title>M3B1</title>
   <meta name="language" content="es">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
@@ -92,7 +92,7 @@ body {
   </style>
 </head>
 <body>
-  <div id="turno">Juegan blancas</div>
+  <div id="turno">Juegan negras</div>
   
   <div id="board-container">
     <div id="board"></div>
@@ -125,12 +125,12 @@ body {
           text-align: center;
           white-space: nowrap;
         ">
-        DxD
+        Txh2+
       </div>
     </div>
 
     <!-- Botón siguiente -->
-    <a href=".html">
+    <a href="M3B2.html">
       <img src="../../Imagenes/siguiente1.png" style="cursor: pointer; max-width: 100%; height: auto;">
     </a>
   </div>
@@ -193,7 +193,7 @@ body {
   }
 
   function loadInitialPosition() {
-    const fen = "";
+    const fen = "3R4/3P1pkp/6p1/2q3Pn/8/5P2/1r5P/R2Q3K b - - 0 1";
     game.load(fen);
     board.position(fen);
     showMessage("");
