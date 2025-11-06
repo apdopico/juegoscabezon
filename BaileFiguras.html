@@ -119,7 +119,13 @@
       background-color: black;
       clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
     }
-    @media (max-width: 480px) {
+  @media (max-height: 760px) {
+   .tabla-container {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+  }
+  @media (max-width: 480px) {
   body {
     transform: scale(0.9); /* reduce todo el contenido al 85% */
     transform-origin: top center; /* mantiene centrado desde arriba */
