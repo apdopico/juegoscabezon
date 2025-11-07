@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Página principal -->
-  <url>
-    <loc>https://www.juegoscabezon.online/</loc>
-    <lastmod>2025-11-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+<url>
+<loc>https://www.juegoscabezon.online/</loc>
+<changefreq>weekly</changefreq>
+<priority>1.0</priority>
+</url>
 
-  <!-- Páginas principales -->
-  <url><loc>https://www.juegoscabezon.online/BaileFiguras.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Banderas.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/CadaOveja.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/ColoresC.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Contrarreloj.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/DyV.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Mas7.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Matricula.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Menos7.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Oso.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Ranas.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Ranas2D.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Suma18.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Telefonos.html</loc></url>
-  <url><loc>https://www.juegoscabezon.online/SenLinea.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/BaileFiguras.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Banderas.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/CadaOveja.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/ColoresC.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Contrarreloj.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/DyV.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Mas7.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Matricula.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Menos7.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Oso.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Ranas.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Ranas2D.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Suma18.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/Telefonos.html</loc></url>
+<url><loc>https://www.juegoscabezon.online/5enLinea.html</loc></url>
 
-  <!-- Carpetas con juegos -->
-  <url><loc>https://www.juegoscabezon.online/Ajedrez/</loc></url>
-  <url><loc>https://www.juegoscabezon.online/CdeL/</loc></url>
-  <url><loc>https://www.juegoscabezon.online/EmpiezaX/</loc></url>
-  <url><loc>https://www.juegoscabezon.online/PenC/</loc></url>
-  <url><loc>https://www.juegoscabezon.online/Sopas/</loc></url>
+<url><loc>https://www.juegoscabezon.online/Ajedrez/</loc></url>
+<url><loc>https://www.juegoscabezon.online/CdeL/</loc></url>
+<url><loc>https://www.juegoscabezon.online/EmpiezaX/</loc></url>
+<url><loc>https://www.juegoscabezon.online/PenC/</loc></url>
+<url><loc>https://www.juegoscabezon.online/Sopas/</loc></url>
 
 </urlset>

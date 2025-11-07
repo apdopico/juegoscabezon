@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Palabras en cruz 16</title>
+        <meta name="language" content="es">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <link rel="icon" type="image/png" href="../Imagenes/faviconCabeza.png"/>
+      <style type="text/css">
+          body{position:relative;margin:auto;;margin-top:2em;width:26em;background-color:#3d5c5c;background-image: url("../Imagenes/imagenFondo.png");font-family:"Times New Roman",serif;font-size:1.25em;}
+          table{margin:auto;border-collapse:collapse;margin-top:2em;text-align:center;background-color:rgb(233,233,219);}
+          #cruz {border: 2px solid #000;width:1.5em;height:1.5em;}
+          #cruz td{border:1px solid black;width:1.5em;height:1.5em;padding: 0;}
+          #escribir{border:1px solid black;width:13em;height:2em;line-height:1.5em;font-size:1.25em;}
+          #palabra{width:7em;border:1px solid black;}
+          #letras{border:1px solid black;}
+          #letras td{border:none;width:2em;}
+          #letras tr{height:2em;}
+          td img {vertical-align: middle;}
+          input:focus{outline:none;}
+          input{font-family:"Times New Roman",serif;font-size:1.25em;text-align:center;width:1.5em;height:1.5em;border:none;background-color:transparent;line-height:normal;padding:0;}
+          @media (max-width: 600px){
+    body {
+        font-size: 1em;
+    }
+
+    input {
+        font-size: 1.5em;      /* letra más grande */
+        padding: 0;            /* evita que crezca la celda */
+        line-height: 1.5em;    /* centra la letra verticalmente */
+        overflow: hidden;      /* por si se desborda */
+    }
+
+    #letras input {
+        font-size: 1.75em;     /* botones de letras más grandes */
+    }
+}
+
+    </style>
+      <script>
+        var palabra="";
+        const palabrasMapa={
+            "LENTO":["C4","C5","C6","C7","C8"],
+            "LETON":["E8","F8","G8","H8","I8"],
+            "TELON":["A1","A2","A3","A4","A5"],
+            "TONEL":["F2","F3","F4","F5","F6"],
+            "LEON":["C4","D4","E4","F4"],
+            "LOEN":["F6","G6","H6","I6"],
+            "LOTE":["A7","B7","C7","D7"],
+            "NETO":["H5","H6","H7","H8"],
+            "NOTE":["D1","D2","D3","D4"],
+            "TOEN":["A1","B1","C1","D1"],
+            "TOLE":["F2","G2","H2","I2"],
+        }
+        function escribirT(){palabra=palabra+"T";escribir();}
+        function escribirE(){palabra=palabra+"E";escribir();}
+        function escribirL(){palabra=palabra+"L";escribir();}
+        function escribirO(){palabra=palabra+"O";escribir();}
+        function escribirN(){palabra=palabra+"N";escribir();}
+        function escribir(){document.getElementById("palabra").innerHTML=palabra;}
+        function escribirPC() {
+    if (palabrasMapa[palabra]) {
+        // Verificar si la palabra ya ha sido subida (es decir, las casillas ya están ocupadas)
+        let palabraYaSubida = palabrasMapa[palabra].every((id) => {
+            return document.getElementById(id).value === palabra[palabrasMapa[palabra].indexOf(id)];
+        });
+
+        if (palabraYaSubida) {
+            // Cambiar temporalmente las letras a rojo
+            palabrasMapa[palabra].forEach((id) => {
+                let celda = document.getElementById(id);
+                celda.style.color = "red"; // Cambiar texto a rojo
+            });
+
+            // Restaurar el estilo original después de 1 segundo
+            setTimeout(() => {
+                palabrasMapa[palabra].forEach((id) => {
+                    let celda = document.getElementById(id);
+                    celda.style.color = ""; // Quitar el estilo rojo
+                });
+            }, 1000);
+
+            return; // Salir de la función para evitar duplicar acciones
+        }
+
+        // Si la palabra no ha sido subida, rellenar las casillas
+        palabrasMapa[palabra].forEach((id, index) => {
+            document.getElementById(id).value = palabra[index];
+        });
+        if (verificarCompleto()) {
+            mostrarMedalla();
+        }
+        borrar();
+         } else {
+    if (window.innerWidth <= 768) { 
+        document.getElementById("palabra").innerHTML = "No válida";
+    } else {
+        document.getElementById("palabra").innerHTML = "Palabra no válida";
+    }
+    setTimeout(() => {
+        borrar();
+    }, 1000);
+    }
+}
+
+        function borrar(){
+            palabra="";
+            document.getElementById("palabra").innerHTML=palabra;
+        }
+        function verificarCompleto() {
+           for (let palabra in palabrasMapa) {
+           if (!palabrasMapa[palabra].every((id, index) => document.getElementById(id).value.toUpperCase() === palabra[index])) {
+           return false; // Si alguna palabra no está completa, retornar falso
+           }
+          }
+          return true; // Si todas las palabras están completas, retornar verdadero
+        }
+        function mostrarMedalla(){
+            let tabla=document.getElementById("cruz");
+            tabla.style.backgroundImage="url('../Imagenes/medallaPC.png')";
+            tabla.style.backgroundRepeat="no-repeat";
+            tabla.style.backgroundPosition="center";
+            tabla.style.backgroundSize = "contain";
+        }
+      </script>
+    </head>
+    <body>
+     <table id="cruz">
+        <tr>
+            <td><input type="button" id="A1"></td>
+            <td><input type="button" id="B1"></td>
+            <td><input type="button" id="C1"></td>
+            <td><input type="button" id="D1"></td>
+            <td style="border:none"><input type="button" id="E1"></td>
+	        <td style="border:none"><input type="button" id="F1"></td>
+            <td style="border:none"><input type="button" id="G1"></td>
+            <td style="border:none"><input type="button" id="H1"></td>
+            <td style="border:none"><input type="button" id="I1"></td>      
+        </tr>
+        <tr>
+            <td><input type="button" id="A2"></td>
+            <td style="border:none"><input type="button" id="B2"></td>
+            <td style="border:none"><input type="button" id="C2"></td>
+            <td><input type="button" id="D2"></td>
+            <td style="border:none"><input type="button" id="E2"></td>
+	        <td><input type="button" id="F2"></td>
+            <td><input type="button" id="G2"></td>
+            <td><input type="button" id="H2"></td>
+            <td><input type="button" id="I2"></td>
+        </tr>
+        <tr>
+            <td><input type="button" id="A3"></td>
+            <td style="border:none"><input type="button" id="B3"></td>
+            <td style="border:none"><input type="button" id="C3"></td>
+            <td><input type="button" id="D3"></td>
+            <td style="border:none"><input type="button" id="E3"></td>
+	        <td><input type="button" id="F3"></td>
+            <td style="border:none"><input type="button" id="G3"></td>
+            <td style="border:none"><input type="button" id="H3"></td>
+            <td style="border:none"><input type="button" id="I3"></td>
+        </tr>
+        <tr>
+            <td><input type="button" id="A4"></td>
+            <td style="border:none"><input type="button" id="B4"></td>
+            <td><input type="button" id="C4"></td>
+            <td><input type="button" id="D4"></td>
+            <td><input type="button" id="E4"></td>
+	        <td><input type="button" id="F4"></td>
+            <td style="border:none"><input type="button" id="G4"></td>
+            <td style="border:none"><input type="button" id="H4"></td>
+            <td style="border:none"><input type="button" id="I4"></td>
+        </tr>
+        <tr>
+            <td><input type="button" id="A5"></td>
+            <td style="border:none"><input type="button" id="B5"></td>
+            <td><input type="button" id="C5"></td>
+            <td style="border:none"><input type="button" id="D5"></td>
+            <td style="border:none"><input type="button" id="E5"></td>
+	        <td><input type="button" id="F5"></td>
+            <td style="border:none"><input type="button" id="G5"></td>
+            <td><input type="button" id="H5"></td>
+            <td style="border:none"><input type="button" id="I5"></td>
+        </tr>
+        <tr>
+            <td style="border:none"><input type="button" id="A6"></td>
+            <td style="border:none"><input type="button" id="B6"></td>
+            <td><input type="button" id="C6"></td>
+            <td style="border:none"><input type="button" id="D6"></td>
+            <td style="border:none"><input type="button" id="E6"></td>
+	        <td><input type="button" id="F6"></td>
+            <td><input type="button" id="G6"></td>
+            <td><input type="button" id="H6"></td>
+            <td><input type="button" id="I6"></td>
+        </tr>
+        <tr>
+            <td><input type="button" id="A7"></td>
+            <td><input type="button" id="B7"></td>
+            <td><input type="button" id="C7"></td>
+            <td><input type="button" id="D7"></td>
+            <td style="border:none"><input type="button" id="E7"></td>
+	        <td style="border:none"><input type="button" id="F7"></td>
+            <td style="border:none"><input type="button" id="G7"></td>
+            <td><input type="button" id="H7"></td>
+            <td style="border:none"><input type="button" id="I7"></td>
+        </tr>
+        <tr>
+            <td style="border:none"><input type="button" id="A8"></td>
+            <td style="border:none"><input type="button" id="B8"></td>
+            <td><input type="button" id="C8"></td>
+            <td style="border: none; background-color: black;"><input type="button" id="D8"></td>
+            <td><input type="button" id="E8"></td>
+	        <td><input type="button" id="F8"></td>
+            <td><input type="button" id="G8"></td>
+            <td><input type="button" id="H8"></td>
+            <td><input type="button" id="I8"></td>
+        </tr>
+    </table>
+     <table id="escribir">
+        <tr>
+            <td><img src="../Imagenes/borrar.png" id="borrar" onclick="borrar()"></td>
+            <td id="palabra"></td>
+            <td>&nbsp;<img src="../Imagenes/subir.png"  id="subir" onclick="escribirPC()">&nbsp;</td>
+        </tr>
+     </table>
+     <table id="letras">
+        <tr>
+            <td><input type="button" value="L" onclick="escribirL()"></td>
+            <td></td>
+            <td><input type="button" value="E" onclick="escribirE()"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="button" value="N" onclick="escribirN()"></td>
+            <td></td>
+           </tr>
+        <tr>
+            <td><input type="button" value="T" onclick="escribirT()"></td>
+            <td></td>
+            <td><input type="button" value="O" onclick="escribirO()"></td>
+        </tr>
+    </table>
+ </body>
+</html>
