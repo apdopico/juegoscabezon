@@ -78,19 +78,20 @@ button img {
 }
 /* ✅ Tablet y móvil */
 @media screen and (max-width: 900px) {
+
   body {
-    width: 95%;        /* que se adapte */
-    font-size: 1rem;   /* tamaño normal */
-    margin-top: 0.1em;
+    width: 95%;
+    font-size: 1rem;
+    margin-top: 1em;
   }
 
   table {
-    border-spacing: 2vw; /* separación relativa */
+    border-spacing: 2vw; /* separación proporcional */
   }
 
   td {
-    width: 18vw;       /* ancho relativo a la pantalla */
-    height: 14vw;
+    width: 18vw;               /* anchura relativa */
+    height: min(14vw, 12vh);   /* 🔥 altura adaptable al alto disponible */
   }
 
   td img {
@@ -98,8 +99,8 @@ button img {
   }
 
   button {
-    width: 10vw;
-    height: 10vw;
+    width: 14vw;
+    height: min(14vw, 12vh);   /* mismo ajuste del botón */
     margin-top: 3vw;
   }
 
