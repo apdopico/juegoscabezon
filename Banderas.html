@@ -81,27 +81,53 @@ button img {
 
   body {
     width: 95%;
+    margin: 0 auto;
+    padding: 1vh 0;
     font-size: 1rem;
-    margin-top: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   table {
-    border-spacing: 2vw; /* separación proporcional */
+    width: 100%;
+    border-spacing: 1.2vw; /* separación relativa */
   }
 
-  td {
-    width: 18vw;               /* anchura relativa */
-    height: min(14vw, 12vh);   /* 🔥 altura adaptable al alto disponible */
+  /* Tabla superior */
+  #t1 td {
+    width: calc(100vw / 4 - 3vw);
+    height: calc(34vh / 4 - 1vh);
+  }
+
+  /* Texto */
+  #texto {
+    margin: 2vh 0;
+    font-size: 1.4rem;
+    height: 6vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Tabla inferior */
+  #t2 td {
+    width: calc(100vw / 4 - 3vw);
+    height: calc(34vh / 4 - 1vh);
   }
 
   td img {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    display: block;
   }
 
+  /* Botón */
   button {
-    width: 14vw;
-    height: min(14vw, 12vh);   /* mismo ajuste del botón */
-    margin-top: 3vw;
+    width: 5vh;
+    height: 5vh;
+    margin-top: 2vh;
   }
 
   button img {
