@@ -26,12 +26,14 @@ p{
 
 table{
   margin: 0 auto;
-  border-collapse: collapse;   /* evita espacios entre celdas */
+  border-collapse: separate;
+  border-spacing: 9px;
+  background-color: antiquewhite;
 }
 
 td{
   border:solid black 1px;
-  background-color: antiquewhite;
+  background-color: white;
   width: 75px;      /* tamaño fijo para todas las celdas */
   height: 50px;
   position: relative;
@@ -71,38 +73,41 @@ button img {
 
 @media (max-height: 760px) {
     body {
-    top: 1;          
-    margin-top: 1;
+    top: 2.5em;          
+    margin-top: 0.25em;
   }
 }
-@media screen and (max-width: 600px) {
+/* ✅ Tablet y móvil */
+@media screen and (max-width: 900px) {
   body {
-    width: 22.5em;
-    font-size: 0.75em;
+    width: 95%;        /* que se adapte */
+    font-size: 1rem;   /* tamaño normal */
+    margin-top: 1em;
+  }
+
+  table {
+    border-spacing: 2vw; /* separación relativa */
   }
 
   td {
-    width: 55px;
-    height: 40px;
+    width: 18vw;       /* ancho relativo a la pantalla */
+    height: 14vw;
   }
 
   td img {
-    width: 100%;
-    height: 100%;
     object-fit: contain;
   }
-  button {
-  width: 28px;   /* 75% de 35px */
-  height: 28px;
-  margin-top: 2em;
-  margin-left:auto;
-  margin-right:auto;
-}
-button img {
-  width: 100%;
-  height: auto;
-}
 
+  button {
+    width: 14vw;
+    height: 14vw;
+    margin-top: 3vw;
+  }
+
+  button img {
+    width: 100%;
+    height: auto;
+  }
 }
 
 </style>
