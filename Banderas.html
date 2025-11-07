@@ -103,7 +103,7 @@ button img {
   /* Texto */
   #texto {
     margin: 2vh 0;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     height: 6vh;
     display: flex;
     align-items: center;
@@ -117,11 +117,12 @@ button img {
   }
 
   td img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* ✔️ Ahora la imagen llena la celda por completo */
+  display: block;
+}
+
 
   /* Botón */
   button {
