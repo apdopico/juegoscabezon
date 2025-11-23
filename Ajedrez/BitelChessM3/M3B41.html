@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>M3B41</title>
+  <meta name="language" content="es">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="icon" type="image/png" href="../../Imagenes/faviconCabeza.png"/>
+  
+  <!-- CSS de chessboard.js -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+
+  <style>
+ * {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  background-color:  #3d5c5c;
+  background-image: url("../../Imagenes/imagenFondo.png");
+  margin-top: 5em;
+  font-size: clamp(16px, 4vw, 22px);
+}
+
+#turno {
+  margin-bottom: 1em;
+  font-size: clamp(1.5em, 5vw, 2.5em);
+}
+
+#board-container {
+  position: relative;
+  width: 90vw;
+  max-width: 500px;
+}
+
+#board {
+  width: 90vw;
+  max-width: 500px;
+  aspect-ratio: 1/1;
+  background-color: #f0d9b5;
+  margin-bottom: 2em;
+}
+
+#message {
+  position: absolute;
+  top: 46.25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: black;
+  font-size: clamp(2em, 6vw, 3.5em);
+  display: none;
+  z-index: 10;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  body {
+    margin-top: 3em;
+  }
+  #board {
+    width: 95vw;
+    max-width: 95vw;
+  }
+  #board-container {
+    width: 95vw;
+    max-width: 95vw;
+  }
+  div[style*="display: flex"] img {
+    width: clamp(2em, 6vw, 3em);
+    height: auto;
+    margin: 0 0.5em;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: portrait) {
+  #board-container,
+  #board {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 95vw;
+    max-width: 95vw;
+  }
+}
+  </style>
+</head>
+<body>
+  <div id="turno">Juegan negras</div>
+  
+  <div id="board-container">
+    <div id="board"></div>
+    <div id="message"></div>
+  </div>
+
+  <!-- Bloque de botones -->
+  <div style="display: flex; align-items: center; justify-content: center; gap: 2em;">
+    <!-- Botón reiniciar -->
+    <a href="#" onclick="location.reload(); return false;">
+      <img src="../../Imagenes/reiniciar2.png" style="cursor: pointer; max-width: 100%; height: auto;">
+    </a>
+
+    <!-- Contenedor del botón y el texto de ayuda -->
+    <div id="ayuda-container" style="position: relative; width: 4em; text-align: center;">
+      <!-- Botón de ayuda -->
+      <a id="botonAyuda" href="#" onclick="mostrarAyuda(); return false;">
+        <img src="../../Imagenes/interrogacion.png" style="cursor: pointer; max-width: 100%; height: auto;">
+      </a>
+
+      <!-- Texto de ayuda con fondo -->
+      <div id="ayuda" 
+        style="
+          display: none;
+          color: rgba(137, 93, 59);
+          font-size: 1em;
+          background-color: rgba(240, 217, 181);
+          border: 2px solid rgba(110, 72, 36);
+          padding: 0.3em 0.3em;
+          text-align: center;
+          white-space: nowrap;
+        ">
+        De3+
+      </div>
+    </div>
+
+    <!-- Botón siguiente -->
+    <a href="M3B42.html">
+      <img src="../../Imagenes/siguiente1.png" style="cursor: pointer; max-width: 100%; height: auto;">
+    </a>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <!-- chess.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+  <!-- chessboard.js -->
+  <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+  <!-- stockfish.js -->
+  <script src="../stockfish.js" defer></script>
+
+  <script>
+  const game = new Chess();
+  let stockfish = null;
+
+  const board = Chessboard('board', {
+    draggable: true,
+    responsive: true,
+    showNotation: false,
+    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+
+    onDragStart: function (source, piece) {
+      if (
+        game.game_over() ||
+        (game.turn() === 'w' && piece.startsWith('b')) ||
+        (game.turn() === 'b' && piece.startsWith('w'))
+      ) {
+        return false;
+      }
+    },
+
+    onDrop: function (source, target) {
+      const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q'
+      });
+
+      if (move === null) return 'snapback';
+
+      board.position(game.fen());
+
+      if (game.in_checkmate()) {
+        showMessage("¡Jaque mate!");
+      } else {
+        setTimeout(makeComputerMove, 300);
+      }
+    }
+  });
+
+  function showMessage(txt) {
+    const msg = document.getElementById("message");
+    msg.innerHTML = `<div>${txt}</div>`;
+    msg.style.display = "block";
+  }
+
+  function loadInitialPosition() {
+    const fen = "7k/1pN2Q2/6p1/6Pp/2P1r2P/p7/P1P1q3/2K2R2 b - - 0 1";
+    game.load(fen);
+    board.position(fen);
+    showMessage("");
+    document.getElementById("message").style.display = "none";
+  }
+  loadInitialPosition();
+
+  window.addEventListener("load", () => {
+    initEngine();
+  });
+
+  function initEngine() {
+    if (stockfish) return;
+    if (typeof STOCKFISH === "function") {
+      stockfish = STOCKFISH();
+    } else {
+      stockfish = new Worker("../stockfish.js");
+    }
+
+    stockfish.onmessage = function (event) {
+      const line = event.data;
+      console.log("Stockfish:", line);
+
+      if (line.startsWith("bestmove")) {
+        const move = line.split(" ")[1];
+        if (move && move !== "(none)") {
+          game.move(move, { sloppy: true });
+          board.position(game.fen());
+          if (game.in_checkmate()) showMessage("¡Jaque mate!");
+        }
+      }
+    };
+  }
+
+  function sendToEngine(cmd) {
+    if (!stockfish) initEngine();
+    stockfish.postMessage(cmd);
+  }
+
+  function makeComputerMove() {
+    if (game.game_over()) return;
+    initEngine();
+    const fen = game.fen();
+    sendToEngine("position fen " + fen);
+    sendToEngine("go depth 12");
+  }
+
+  // ✅ Mostrar texto de ayuda en lugar del botón
+  function mostrarAyuda() {
+    const ayuda = document.getElementById("ayuda");
+    const botonAyuda = document.getElementById("botonAyuda");
+
+    botonAyuda.style.display = "none";
+    ayuda.style.display = "inline-block";
+  }
+  </script>
+</body>
+</html>

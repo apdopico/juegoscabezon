@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Juego: Multiplica por 3</title>
+  <style>
+    :root{--bg:#0f1724;--accent:#06b6d4;--muted:#94a3b8;--good:#16a34a;--bad:#dc2626}
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#0f1724;color:#e6eef6}
+    .card{width:900px;max-width:100%;background:#111827;border-radius:12px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    h1{margin:0;font-size:22px}
+    .meta{color:var(--muted);margin-bottom:16px}
+    .board{display:grid;grid-template-columns:1fr 240px;gap:20px}
+    .play,.side{background:#1a2333;padding:18px;border-radius:10px}
+    .number{font-size:48px;font-weight:700}
+    .prompt{color:var(--muted);margin-top:6px}
+    input{width:100%;padding:12px;font-size:18px;margin-top:12px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:white} 
+    /* eliminar flechas numéricas */
+    input[type=text]::-webkit-inner-spin-button,
+    input[type=text]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+    button{padding:10px 14px;border-radius:8px;border:0;background:var(--accent);color:#042029;font-weight:700;cursor:pointer;margin-top:10px}
+    .msg{margin-top:14px;padding:10px;border-radius:8px}
+    .msg.good{background:rgba(22,163,74,0.1);color:var(--good)}
+    .msg.bad{background:rgba(220,38,38,0.12);color:var(--bad)}
+    .stat{display:flex;justify-content:space-between;margin-bottom:10px;color:var(--muted)}
+    strong{color:white}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Juego: Multiplica por 3</h1>
+    <div class="meta">Aparece un número primo aleatorio &lt; 100. Multiplícalo por 3 y continúa hasta fallar.</div>
+
+    <div class="board">
+      <main class="play">
+        <div id="currentNumber" class="number">—</div>
+        <div class="prompt">Escribe el resultado de multiplicar por 3:</div>
+
+        <input id="answer" type="text" inputmode="numeric" autocomplete="off" placeholder="Escribe el resultado y pulsa Enter" pattern="[0-9]*" />
+        <button id="submitBtn">Comprobar</button>
+        <button id="newGame">Nuevo juego</button>
+
+        <div id="messageArea"></div>
+      </main>
+
+      <aside class="side">
+        <div class="stat"><span>Racha actual</span><strong id="streak">0</strong></div>
+        <div class="stat"><span>Mejor racha</span><strong id="best">0</strong></div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+const PRIMES = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97];
+
+const nEl = document.getElementById("currentNumber");
+const aEl = document.getElementById("answer");
+const msg = document.getElementById("messageArea");
+const streakEl = document.getElementById("streak");
+const bestEl = document.getElementById("best");
+
+let current = 0n;
+let streak = 0;
+let best = Number(localStorage.getItem("best_3x")||0);
+bestEl.textContent = best;
+
+function prime(){ return BigInt(PRIMES[Math.floor(Math.random()*PRIMES.length)]); }
+function setMsg(t,c){ msg.innerHTML = t?`<div class="msg ${c}">${t}</div>`:""; }
+function render(){ nEl.textContent = current; streakEl.textContent = streak; bestEl.textContent = best; }
+
+function newGame(){
+  current = prime(); streak = 0; setMsg("",""); render(); aEl.value=""; aEl.focus();
+}
+
+function check(){
+  const v = aEl.value.trim(); if(!v) return setMsg("Escribe un número.","bad");
+  let num; try{ num = BigInt(v); } catch{ return setMsg("Número inválido.","bad"); }
+  const exp = current * 3n;
+  if(num === exp){ streak++; current = exp; setMsg("Correcto.","good"); }
+  else{
+    setMsg("Fallo. La respuesta era "+exp,"bad");
+    if(streak > best){ best = streak; localStorage.setItem("best_3x", best); }
+  }
+  render(); aEl.value=""; aEl.focus();
+}
+
+document.getElementById("submitBtn").onclick = check;
+document.getElementById("newGame").onclick = newGame;
+aEl.onkeydown = e => e.key==="Enter" && check();
+
+newGame();
+</script>
+</body>
+</html>
