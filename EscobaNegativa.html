@@ -3,177 +3,218 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Escoba Negativas — Layout inicial (humano vs IA)</title>
+<title>Escoba Negativas — Humano vs IA</title>
 <style>
-  :root{--bg:#0b1220;--panel:#071026;--card-bg:#ffffff;--positive:#0b5fff;--negative:#ff2444;--muted:#9aa4b2}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#eef2ff;display:flex;align-items:center;justify-content:center;height:100vh}
-  .table-wrap{width:920px;background:var(--panel);padding:18px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-  .zone{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px}
-  .zone.top{justify-content:center;margin-bottom:6px}
-  .zone.table{background:linear-gradient(180deg,#07122622,transparent);border-radius:10px;padding:20px;min-height:140px}
+  :root{
+    --bg:#0b1220;--panel:#071026;--card-bg:#ffffff;
+    --positive:#0b5fff;--negative:#ff2444;--muted:#9aa4b2
+  }
+  body{
+    margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+    background:var(--bg);color:#eef2ff;
+    display:flex;align-items:center;justify-content:center;
+    height:100vh
+  }
+  .table-wrap{
+    width:920px;background:var(--panel);
+    padding:18px;border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.6)
+  }
+  .zone{
+    display:flex;align-items:center;justify-content:center;
+    gap:12px;padding:12px
+  }
+  .zone.top{margin-bottom:6px}
   .zone.bottom{margin-top:6px}
-  .card{width:88px;height:120px;border-radius:8px;background:var(--card-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid rgba(0,0,0,.12);box-shadow:0 6px 18px rgba(0,0,0,.6);font-weight:700}
+
+  .zone.table{
+    background:#0a4f0a;
+    border-radius:10px;
+    padding:20px;
+    height:250px;
+    position:relative;
+    overflow:hidden;
+}
+
+  .card{ position:relative; z-index:1; 
+    width:88px;height:120px;border-radius:8px;
+    background:var(--card-bg);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    border:2px solid rgba(0,0,0,.12);
+    box-shadow:0 6px 18px rgba(0,0,0,.6);
+    font-weight:700;
+    cursor:pointer;
+  }
   .card .suit{font-size:12px;opacity:.8}
   .card .value{font-size:22px}
   .card.negative .value,.card.negative .suit{color:var(--negative)}
   .card.positive .value,.card.positive .suit{color:var(--positive)}
-  .card.back{background:linear-gradient(135deg,#0b5fff,#7c3aed);color:white;position:relative}
-  .card.back::after{content:'';position:absolute;inset:10px;border-radius:6px;background:repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 6px, transparent 6px 12px)}
+  .card.back{
+    background:linear-gradient(135deg,#0b5fff,#7c3aed);
+    color:white;position:relative
+  }
+  .card.back::after{
+    content:'';position:absolute;inset:10px;border-radius:6px;
+    background:repeating-linear-gradient(45deg,
+      rgba(255,255,255,.08) 0 6px,transparent 6px 12px)
+  }
+
   .controls{display:flex;gap:8px;justify-content:center;margin-top:12px}
   button{background:#1f2937;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
   h2{margin:6px 0 10px;font-size:16px}
   .label{color:var(--muted);font-size:13px;text-align:center;margin-top:6px}
-  /* central area override */
-  /* Central area with 2.5 card height and dark green background */
-#tableRow {
-  height: 250px !important;
-  background: #0a4f0a !important;
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  grid-template-rows: repeat(2, auto);
-  justify-content: center;
-  align-content: center;
-  gap: 16px;
-  border-radius: 8px;
+  .table-card {
+  position: absolute;
+  z-index: 10;
 }
+
 </style>
 </head>
 <body>
   <div class="table-wrap">
-    <h2>Escoba (variante negativas 1–6) — Layout inicial</h2>
+    <h2>Escoba (variante negativas 1–6) — Humano vs IA</h2>
 
-    <div class="zone top" id="iaRow">
-      <!-- IA: 3 cartas boca abajo -->
-    </div>
-
-    <div class="zone table" id="tableRow">
-      <!-- Mesa: 4 cartas descubiertas -->
-    </div>
-
-    <div class="zone bottom" id="playerRow">
-      <!-- Jugador: 3 cartas descubiertas -->
-    </div>
+    <div class="zone top" id="iaRow"></div>
+    <div class="zone table" id="tableRow"></div>
+    <div class="zone bottom" id="playerRow"></div>
 
     <div class="controls">
       <button id="dealBtn">Barajar y repartir</button>
       <button id="showBtn">Mostrar mazo (consola)</button>
     </div>
 
-    <div class="label">Las cartas se muestran como <strong>1O, 2O, ... S O, CO, RO</strong>. Color <span style="color:var(--positive)">azul</span> = positiva; <span style="color:var(--negative)">rojo</span> = negativa (1–6 marcadas).</div>
+    <div class="label">Cartas: 1O, 2O... S O, CO, RO. Azul = positiva; rojo = negativa.</div>
   </div>
 
 <script>
-  // Suits: O=oros, C=copas, E=espadas, B=bastos
-  const suits = [{id:'O',name:'oros'},{id:'C',name:'copas'},{id:'E',name:'espadas'},{id:'B',name:'bastos'}];
-  // Values: 1-7, 10(Sota),11(Caballo),12(Rey)
-  const numeric = [1,2,3,4,5,6,7,10,11,12];
-  function label(v){
-    if(v===10) return 'S';
-    if(v===11) return 'C';
-    if(v===12) return 'R';
-    return String(v);
+const suits=[{id:'O',name:'oros'},{id:'C',name:'copas'},{id:'E',name:'espadas'},{id:'B',name:'bastos'}];
+const numeric=[1,2,3,4,5,6,7,10,11,12];
+
+function label(v){ return v===10? 'S': v===11? 'C': v===12? 'R': String(v); }
+
+function buildDeck(){
+  const deck=[];
+  for(const s of suits){
+    for(const v of numeric){ deck.push({suit:s.id,value:v,label:label(v)+s.id,negative:false}); }
   }
-
-  // Build deck: positives = full 40; negatives = 1..6 of each suit (24). We'll mark 1..6 copies as negative.
-  function buildDeck(){
-    const deck=[];
-    // positives (full 40)
-    for(const s of suits){
-      for(const v of numeric){
-        deck.push({suit:s.id, value:v, label: label(v)+s.id, negative:false});
-      }
-    }
-    // negatives (1..6)
-    for(const s of suits){
-      for(let v=1; v<=6; v++){
-        deck.push({suit:s.id, value:v, label: label(v)+s.id, negative:true});
-      }
-    }
-    return deck;
+  for(const s of suits){
+    for(let v=1;v<=6;v++){ deck.push({suit:s.id,value:v,label:label(v)+s.id,negative:true}); }
   }
-
-  function shuffle(a){
-    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
-    return a;
-  }
-
-  const iaRow = document.getElementById('iaRow');
-  const tableRow = document.getElementById('tableRow');
-  const playerRow = document.getElementById('playerRow');
-
-  let deck = [];
-  let iaHand = [];
-  let tableCards = [];
-  let playerHand = [];
-
-  function renderBackCard(){
-    const d = document.createElement('div'); d.className='card back'; d.textContent=''; d.style.width='88px'; d.style.height='120px'; return d;
-  }
-
-  function renderCard(card){
-    const d = document.createElement('div'); d.className='card';
-    d.classList.add(card.negative? 'negative':'positive');
-    const suit = document.createElement('div'); suit.className='suit'; suit.textContent = card.suit==='O'?'Oros':(card.suit==='C'?'Copas':(card.suit==='E'?'Espadas':'Bastos'));
-    const val = document.createElement('div'); val.className='value'; val.textContent = (card.label);
-    d.appendChild(suit); d.appendChild(val);
-    d.dataset.label = card.label;
-    d.addEventListener('click', ()=> onCardClick(card, d));
-    return d;
-  }(card){
-    const d = document.createElement('div'); d.className='card';
-    d.classList.add(card.negative? 'negative':'positive');
-    const suit = document.createElement('div'); suit.className='suit'; suit.textContent = card.suit==='O'?'Oros':(card.suit==='C'?'Copas':(card.suit==='E'?'Espadas':'Bastos'));
-    const val = document.createElement('div'); val.className='value'; val.textContent = (card.label);
-    d.appendChild(suit); d.appendChild(val);
-    return d;
-  }
-
-  function dealInitial(){
-    deck = shuffle(buildDeck());
-    // clear
-    iaHand = []; tableCards = []; playerHand = [];
-    iaRow.innerHTML=''; tableRow.innerHTML=''; playerRow.innerHTML='';
-    // IA: 3 cartas boca abajo (take from deck but show backs)
-    for(let i=0;i<3;i++){
-      const card = deck.pop(); iaHand.push(card);
-      iaRow.appendChild(renderBackCard());
-    }
-    // Mesa: 4 cartas descubiertas
-    for(let i=0;i<4;i++){ const c = deck.pop(); tableCards.push(c); tableRow.appendChild(renderCard(c)); }
-    // Jugador: 3 cartas descubiertas
-    for(let i=0;i<3;i++){ const c = deck.pop(); playerHand.push(c); playerRow.appendChild(renderCard(c)); }
-  }
-
-  document.getElementById('dealBtn').addEventListener('click',()=>{ dealInitial(); });
-  document.getElementById('showBtn').addEventListener('click',()=>{ console.log('IA hand (hidden):', iaHand); console.log('Mesa:', tableCards); console.log('Jugador:', playerHand); alert('Ver consola para el mazo / manos (objetos JS).') });
-
-  let selectedCard = null;
-
-function onCardClick(card, element){
-  if(!playerHand.includes(card)) return;
-  if(selectedCard === card){
-    element.style.outline = '';
-    selectedCard = null;
-  } else {
-    document.querySelectorAll('#playerRow .card').forEach(c=> c.style.outline='');
-    element.style.outline = '3px solid yellow';
-    selectedCard = card;
-  }
+  return deck;
 }
 
-document.getElementById('tableRow').addEventListener('click', ()=>{
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function renderBackCard(){
+  const d=document.createElement('div');
+  d.className='card back';
+  return d;
+}
+
+function renderCard(card){
+  const d=document.createElement('div'); d.className='card';
+  d.classList.add(card.negative?'negative':'positive');
+
+  const suit=document.createElement('div'); suit.className='suit';
+  suit.textContent= card.suit==='O'?'Oros':card.suit==='C'?'Copas':card.suit==='E'?'Espadas':'Bastos';
+
+  const val=document.createElement('div'); val.className='value'; val.textContent=card.label;
+
+  d.appendChild(suit); d.appendChild(val);
+  d.dataset.label=card.label;
+  d.addEventListener('click',()=>onCardClick(card,d));
+  return d;
+}
+
+let deck=[], iaHand=[], tableCards=[], playerHand=[];
+const iaRow=document.getElementById('iaRow');
+const tableRow=document.getElementById('tableRow');
+const playerRow=document.getElementById('playerRow');
+let selectedCard=null;
+
+function dealInitial(){
+  deck=shuffle(buildDeck());
+  iaHand=[]; tableCards=[]; playerHand=[];
+  iaRow.innerHTML=''; tableRow.innerHTML=''; playerRow.innerHTML='';
+
+  for(let i=0;i<3;i++){ iaHand.push(deck.pop()); iaRow.appendChild(renderBackCard()); }
+  for(let i=0;i<4;i++){ const c=deck.pop(); tableCards.push(c); tableRow.appendChild(renderCard(c)); }
+  for(let i=0;i<3;i++){ const c=deck.pop(); playerHand.push(c); playerRow.appendChild(renderCard(c)); }
+}
+
+dealInitial();
+
+document.getElementById('dealBtn').addEventListener('click',dealInitial);
+document.getElementById('showBtn').addEventListener('click',()=>{
+  console.log('IA:',iaHand,'Mesa:',tableCards,'Jugador:',playerHand);
+  alert('Mira la consola.');
+});
+
+function onCardClick(card,el){
+  if(!playerHand.includes(card)) return;
+  if(selectedCard===card){ el.style.outline=''; selectedCard=null; return; }
+  document.querySelectorAll('#playerRow .card').forEach(c=>c.style.outline='');
+  el.style.outline='3px solid yellow';
+  selectedCard=card;
+}
+
+tableRow.addEventListener('click',(e)=>{
   if(!selectedCard) return;
-  playerHand = playerHand.filter(c=> c !== selectedCard);
+
+  const rect = tableRow.getBoundingClientRect();
+
+  let x = e.clientX - rect.left - 44;
+  let y = e.clientY - rect.top - 60;
+
+  x = Math.max(0, Math.min(rect.width - 88, x));
+  y = Math.max(0, Math.min(rect.height - 120, y));
+
+  selectedCard.x = x;
+  selectedCard.y = y;
+
+  playerHand = playerHand.filter(c=>c!==selectedCard);
   tableCards.push(selectedCard);
-  playerRow.innerHTML='';
-  playerHand.forEach(c=> playerRow.appendChild(renderCard(c)));
-  tableRow.innerHTML='';
-  tableCards.forEach(c=> tableRow.appendChild(renderCard(c)));
+
+  redraw();
   selectedCard = null;
 });
 
-// Auto deal on load
-  dealInitial();
+function redraw(){
+  // --- IA ---
+  iaRow.innerHTML = '';
+  for(let i=0;i<3;i++){
+    if(iaHand[i]){
+      iaRow.appendChild(renderBackCard());
+    } else {
+      const ph=document.createElement('div');
+      ph.className='card placeholder';
+      iaRow.appendChild(ph);
+    }
+  }
+
+  // --- Jugador ---
+  playerRow.innerHTML='';
+  for(let i=0;i<3;i++){
+    if(playerHand[i]){
+      playerRow.appendChild(renderCard(playerHand[i]));
+    } else {
+      const ph=document.createElement('div');
+      ph.className='card placeholder';
+      playerRow.appendChild(ph);
+    }
+  }
+
+  // --- Mesa ---
+  tableRow.innerHTML='';
+  tableCards.forEach(c=>{
+    const el=renderCard(c);
+    el.style.left=c.x+'px';
+    el.style.top=c.y+'px';
+    el.classList.add('table-card{ position:absolute; z-index:10; ');
+    tableRow.appendChild(el);
+  });
+}
 </script>
 </body>
 </html>
