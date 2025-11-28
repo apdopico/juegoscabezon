@@ -4,23 +4,89 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>No3enRaya</title>
-  <link rel="icon" type="image/png" href="https://apdopico.github.io/juegoscabezon/Imagenes/faviconCabeza.png?v=3">
+  <link rel="icon" type="image/png" href="./Imagenes/faviconCabeza.png">
+
   <style>
     body {
       background-color: #3d5c5c;
-      background-image: url("../Imagenes/imagenFondo.png");
+      background-image: url("./Imagenes/imagenFondo.png");
       font-family: sans-serif;
       text-align: center;
       margin: 0;
-      padding-top: 40px;
+      padding-top: 20px;
       color: #fff;
     }
 
+    /* --- CAJAS SUPERIOR E INFERIOR --- */
+
+    .player-box {
+      width: 90vw;
+      max-width: 420px;
+      margin: 0 auto 20px auto;
+      background: antiquewhite;
+      color: #111;
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      box-sizing: border-box;
+      border: 2px solid #333;
+      min-height: 70px;
+    }
+
+    .player-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Copa a la derecha */
+    .crown {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 41px;
+      height: 50px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .crown.visible {
+      opacity: 1;
+    }
+
+    /* Área donde van las fichas */
+    .pieces-area {
+      flex: 1;
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      gap: 6px;
+      padding-left: 10px;
+    }
+
+    /* Fichas grandes */
+    .piece-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      transition: opacity 0.3s ease;
+    }
+
+    .p1 { background: #ff6b6b; }
+    .p2 { background: #4d96ff; }
+
+    /* --- TABLERO --- */
     .board {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      margin: 0 auto;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      margin: 0 auto 20px auto;
       background-color: antiquewhite;
       width: 90vw;
       max-width: 420px;
@@ -34,7 +100,7 @@
     .cell {
       width: 100%;
       height: 100%;
-      font-size: min(5vw, 28px);
+      font-size: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -57,350 +123,295 @@
       border-radius: 50%;
     }
 
-    .p1 { background: #ff6b6b; }
-    .p2 { background: #4d96ff; }
-
-    .score {
-      margin-top: 18px;
-      font-size: 18px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .score table {
-      border-collapse: collapse;
-      background-color: antiquewhite;
-      overflow: hidden;
-      color: #111;
-    }
-
-    .score td {
-      padding: 6px 12px;
-      border: 1px solid #444;
-      text-align: center;
-      height: 36px;
-      vertical-align: middle;
-    }
-
-    .cell-nombre {
-      position: relative;
-      text-align: left;
-      padding-left: 10px;
-      height: 1.8em;
-      overflow: hidden;
-    }
-
-    .crown {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -55%) scale(0.7);
-      font-size: 1.4em;
-      opacity: 0;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .crown.visible {
-      opacity: 1;
-      transform: translate(-50%, -55%) scale(1);
-    }
-
-    .reiniciar-btn {
+    /* Reiniciar */
+    #resetBtn {
       background: none;
       border: none;
       cursor: pointer;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.2s ease;
+      margin-top: -10px;
     }
 
-    .reiniciar-btn:hover { transform: scale(1.06); }
-
-    .reiniciar-btn img { width: 25px; height: 25px; object-fit: contain; }
-
-    #status {
-      padding: 6px;
-      font-weight: 700;
+    #resetBtn img {
+      width: 50px;
+      height: 50px;
     }
   </style>
 </head>
 <body>
-  
-  <div id="board" class="board" aria-label="Tablero 4x4"></div>
 
-  <div class="score">
-    <table role="table" aria-label="Marcador">
-      <tr>
-        <td colspan="2" id="status" role="cell">Turno: Máquina</td>
-      </tr>
-      <tr id="rowJugador">
-        <td class="cell-nombre" role="cell">
-          <span id="crownJugador" class="crown" aria-hidden="true"></span>
-          Jugador
-        </td>
-        <td role="cell"><span id="jugadorRest">8</span> fichas</td>
-      </tr>
-      <tr>
-        <td class="cell-nombre" role="cell">
-          <span id="crownIA" class="crown" aria-hidden="true"></span>
-          Máquina
-        </td>
-        <td role="cell"><span id="iaRest">8</span> fichas</td>
-      </tr>
-      <tr>
-        <td colspan="2" role="cell">
-          <button id="resetBtn" class="reiniciar-btn" aria-label="Reiniciar partida">
-            <img src="https://apdopico.github.io/juegoscabezon/Imagenes/reiniciar2.png" alt="Reiniciar">
-          </button>
-        </td>
-      </tr>
-    </table>
+  <!-- CAJA SUPERIOR IA -->
+  <div class="player-box">
+    <img src="Imagenes/IA.png" class="player-icon">
+    <img id="crownIA" class="crown" src="Imagenes/iconoCopa.png">
+
+    <div id="iaPieces" class="pieces-area"></div>
   </div>
 
+  <!-- TABLERO -->
+  <div id="board" class="board"></div>
+
+  <!-- CAJA INFERIOR JUGADOR -->
+  <div class="player-box">
+    <img src="Imagenes/jugador.png" class="player-icon">
+    <img id="crownJugador" class="crown" src="Imagenes/iconoCopa.png">
+
+    <div id="jugadorPieces" class="pieces-area"></div>
+  </div>
+
+  <!-- BOTÓN REINICIAR -->
+  <button id="resetBtn">
+    <img src="Imagenes/reiniciar2.png" alt="Reiniciar">
+  </button>
+
+
 <script>
-    (function(){
-      const boardEl = document.getElementById('board');
-      const statusEl = document.getElementById('status');
-      const jugadorRest = document.getElementById('jugadorRest');
-      const iaRest = document.getElementById('iaRest');
-      const crownJugador = document.getElementById('crownJugador');
-      const crownIA = document.getElementById('crownIA');
-      const resetBtn = document.getElementById('resetBtn');
+(function(){
 
-      const AI = 2, HUMAN = 1;
-      const SIZE = 4;
+  const SIZE = 5;
+  const HUMAN = 1;
+  const AI = 2;
+  const MAX_PIECES = 12;
 
-      // 🔥 Primera partida empieza Máquina
-      let nextStartingPlayer = 2;
+  const boardEl = document.getElementById('board');
+  const jugadorPiecesEl = document.getElementById('jugadorPieces');
+  const iaPiecesEl = document.getElementById('iaPieces');
 
-      function generateWins(){
-        const wins = [];
-        const size=SIZE;
-        for(let r=0;r<size;r++){
-          for(let c=0;c<=size-3;c++)
-            wins.push([r*size+c, r*size+c+1, r*size+c+2]);
-        }
-        for(let c=0;c<size;c++){
-          for(let r=0;r<=size-3;r++)
-            wins.push([r*size+c, (r+1)*size+c, (r+2)*size+c]);
-        }
-        for(let r=0;r<=size-3;r++){
-          for(let c=0;c<=size-3;c++)
-            wins.push([r*size+c, (r+1)*size+(c+1), (r+2)*size+(c+2)]);
-        }
-        for(let r=0;r<=size-3;r++){
-          for(let c=2;c<size;c++)
-            wins.push([r*size+c, (r+1)*size+(c-1), (r+2)*size+(c-2)]);
-        }
-        return wins;
+  const crownJugador = document.getElementById('crownJugador');
+  const crownIA = document.getElementById('crownIA');
+
+  const resetBtn = document.getElementById('resetBtn');
+
+  let nextStartingPlayer = AI;
+  let board;
+  let remaining;
+  let currentPlayer;
+  let gameOver;
+
+  /* --- Generar líneas ganadoras --- */
+  function generateWins(){
+    const wins = [];
+    const size = SIZE;
+
+    for(let r=0;r<size;r++){
+      for(let c=0;c<=size-3;c++)
+        wins.push([r*size+c, r*size+c+1, r*size+c+2]);
+    }
+    for(let c=0;c<size;c++){
+      for(let r=0;r<=size-3;r++)
+        wins.push([r*size+c, (r+1)*size+c, (r+2)*size+c]);
+    }
+    for(let r=0;r<=size-3;r++){
+      for(let c=0;c<=size-3;c++)
+        wins.push([r*size+c, (r+1)*size+(c+1), (r+2)*size+(c+2)]);
+    }
+    for(let r=0;r<=size-3;r++){
+      for(let c=2;c<size;c++)
+        wins.push([r*size+c, (r+1)*size+(c-1), (r+2)*size+(c-2)]);
+    }
+    return wins;
+  }
+
+  const WINS = generateWins();
+
+  function init(){
+    board = Array(SIZE*SIZE).fill(null);
+    remaining = {1: MAX_PIECES, 2: MAX_PIECES};
+    currentPlayer = nextStartingPlayer;
+    nextStartingPlayer = (nextStartingPlayer===HUMAN ? AI : HUMAN);
+    gameOver = false;
+
+    clearCrowns();
+
+    /* CREAR FICHAS SOLO UNA VEZ */
+    jugadorPiecesEl.innerHTML = '';
+    iaPiecesEl.innerHTML = '';
+    for (let i = 0; i < MAX_PIECES; i++) {
+      const pj = document.createElement('div');
+      pj.className = 'piece-box p1';
+      jugadorPiecesEl.appendChild(pj);
+
+      const pa = document.createElement('div');
+      pa.className = 'piece-box p2';
+      iaPiecesEl.appendChild(pa);
+    }
+
+    render();
+    updatePieces();
+
+    if(currentPlayer === AI){
+      setTimeout(()=>aiMove(),400);
+    }
+  }
+
+  function render(){
+    boardEl.innerHTML = '';
+    for(let i=0;i<SIZE*SIZE;i++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.pos = i;
+
+      if(board[i]!=null){
+        const p = document.createElement('div');
+        p.className = 'piece ' + (board[i]===HUMAN?'p1':'p2');
+        cell.appendChild(p);
+        cell.setAttribute('aria-disabled','true');
+      } else {
+        cell.setAttribute('aria-disabled','false');
+        cell.addEventListener('click', onCellClick);
       }
 
-      const WINS = generateWins();
-      let board, remaining, currentPlayer, gameOver;
+      boardEl.appendChild(cell);
+    }
+  }
 
-      function init(){
-        board = Array(SIZE*SIZE).fill(null);
-        remaining = {1:8,2:8};
+  function onCellClick(e){
+    if(gameOver || currentPlayer!==HUMAN) return;
+    const pos = Number(this.dataset.pos);
+    if(board[pos]!=null || remaining[HUMAN]<=0) return;
 
-        // 🔥 Alternancia real entre partidas
-        currentPlayer = nextStartingPlayer;
+    placePiece(pos, HUMAN);
+    if(!gameOver){
+      setTimeout(()=>aiMove(), 350);
+    }
+  }
 
-        // Preparar próxima partida
-        nextStartingPlayer = (nextStartingPlayer === 1 ? 2 : 1);
+  function placePiece(pos, player){
+    board[pos] = player;
+    remaining[player]--;
 
-        gameOver = false;
-        render();
-        updateStatus();
-        updatePieces();
-        clearCrowns();
+    render();
+    updatePieces();
 
-        if(currentPlayer === AI) setTimeout(()=>aiMove(), 500);
+    if(checkThree(player)){
+      gameOver = true;
+      showCrown(player === HUMAN ? AI : HUMAN);
+      return;
+    }
+
+    if(remaining[HUMAN]===0 && remaining[AI]===0){
+      gameOver = true;
+      showCrown('empate');
+      return;
+    }
+
+    currentPlayer = (player===HUMAN ? AI : HUMAN);
+  }
+
+  function checkThree(player, state = board){
+    return WINS.some(line => line.every(i => state[i]===player));
+  }
+
+  /* --- Fichas desapareciendo sin moverse --- */
+  function updatePieces(){
+    jugadorPiecesEl.querySelectorAll('.piece-box').forEach((box, index) => {
+      box.style.opacity = index < remaining[HUMAN] ? "1" : "0";
+    });
+    iaPiecesEl.querySelectorAll('.piece-box').forEach((box, index) => {
+      box.style.opacity = index < remaining[AI] ? "1" : "0";
+    });
+  }
+
+  function clearCrowns(){
+    crownJugador.classList.remove('visible');
+    crownIA.classList.remove('visible');
+  }
+
+  function showCrown(winner){
+    clearCrowns();
+    if(winner===HUMAN){
+      crownJugador.classList.add('visible');
+    } else if(winner===AI){
+      crownIA.classList.add('visible');
+    } else {
+      crownJugador.classList.add('visible');
+      crownIA.classList.add('visible');
+    }
+  }
+
+  /* --- IA --- */
+  function evaluateBoard(state){
+    if(checkThree(AI,state)) return -100;
+    if(checkThree(HUMAN,state)) return 100;
+
+    let score=0;
+    for(const line of WINS){
+      const vals=line.map(i=>state[i]);
+      const ai=vals.filter(v=>v===AI).length;
+      const hu=vals.filter(v=>v===HUMAN).length;
+      const emp=vals.filter(v=>v===null).length;
+
+      if(ai===2 && emp===1) score -= 10;
+      if(hu===2 && emp===1) score += 10;
+      if(ai===1 && emp===2) score -= 2;
+      if(hu===1 && emp===2) score += 2;
+    }
+    return score;
+  }
+
+  function minimax(state, depth, alpha, beta, isMax){
+    if(checkThree(AI,state)) return -100+depth;
+    if(checkThree(HUMAN,state)) return 100-depth;
+    if(depth>=4 || state.every(x=>x!=null)) return evaluateBoard(state);
+
+    if(isMax){
+      let best=-Infinity;
+      for(let i=0;i<SIZE*SIZE;i++){
+        if(state[i]==null){
+          state[i]=AI;
+          const val=minimax(state,depth+1,alpha,beta,false);
+          state[i]=null;
+          best=Math.max(best,val);
+          alpha=Math.max(alpha,best);
+          if(beta<=alpha) break;
+        }
       }
+      return best;
+    } else {
+      let best=Infinity;
+      for(let i=0;i<SIZE*SIZE;i++){
+        if(state[i]==null){
+          state[i]=HUMAN;
+          const val=minimax(state,depth+1,alpha,beta,true);
+          state[i]=null;
+          best=Math.min(best,val);
+          beta=Math.min(beta,best);
+          if(beta<=alpha) break;
+        }
+      }
+      return best;
+    }
+  }
 
-      function render(){
-        boardEl.innerHTML='';
-        for(let i=0;i<SIZE*SIZE;i++){
-          const cell=document.createElement('div');
-          cell.className='cell';
-          cell.setAttribute('data-pos', i);
-          cell.setAttribute('role','button');
-          if(board[i]!==null){
-            const p=document.createElement('div');
-            p.className='piece '+(board[i]===1?'p1':'p2');
-            p.setAttribute('aria-hidden','true');
-            cell.appendChild(p);
-            cell.setAttribute('aria-disabled','true');
-            cell.tabIndex = -1;
-          } else {
-            cell.setAttribute('aria-disabled','false');
-            cell.tabIndex = 0;
-            cell.addEventListener('click', onCellClickBound);
-            cell.addEventListener('keydown', e=>{
-              if((e.key === 'Enter' || e.key === ' ') && !gameOver && currentPlayer===HUMAN){
-                e.preventDefault();
-                onCellClickBound.call(e.currentTarget, e);
-              }
-            });
+  function aiMove(){
+    if(gameOver || currentPlayer!==AI) return;
+
+    let bestScore=-Infinity, bestMove=null;
+    for(let i=0;i<SIZE*SIZE;i++){
+      if(board[i]==null){
+        board[i]=AI;
+        if(!checkThree(AI)){
+          const val=minimax(board,0,-Infinity,Infinity,false);
+          if(val>bestScore){
+            bestScore=val;
+            bestMove=i;
           }
-          boardEl.appendChild(cell);
         }
+        board[i]=null;
       }
+    }
 
-      function onCellClickBound(e){
-        const pos = Number(this.dataset.pos);
-        if(gameOver || currentPlayer!==HUMAN) return;
-        if(board[pos]!==null || remaining[HUMAN]<=0) return;
-        placePiece(pos,HUMAN);
-        if(!gameOver) setTimeout(()=>aiMove(),400);
-      }
+    if(bestMove!=null){
+      placePiece(bestMove,AI);
+    } else {
+      const f = board.findIndex(x=>x==null);
+      if(f!=-1) placePiece(f,AI);
+    }
+  }
 
-      function placePiece(pos,player){
-        board[pos]=player;
-        remaining[player]--;
-        render();
-        updatePieces();
+  resetBtn.addEventListener('click', init);
+  init();
 
-        if(checkThree(player)){
-          gameOver=true;
-          showCrown(player===HUMAN ? AI : HUMAN);
-          return;
-        }
-        if(board.every(x=>x!==null) || (remaining[1]===0 && remaining[2]===0)){
-          gameOver=true;
-          showCrown('empate');
-          return;
-        }
-
-        currentPlayer = (player===HUMAN ? AI : HUMAN);
-        updateStatus();
-      }
-
-      function checkThree(player,state=board){
-        return WINS.some(line=>line.every(i=>state[i]===player));
-      }
-
-      function updateStatus(){
-        statusEl.textContent =
-          gameOver ? 'Partida finalizada' :
-          `Turno: ${currentPlayer===HUMAN ? 'Jugador' : 'Máquina'}`;
-      }
-
-      function updatePieces(){
-        jugadorRest.textContent = remaining[HUMAN];
-        iaRest.textContent = remaining[AI];
-      }
-
-      function clearCrowns(){
-        [crownJugador, crownIA].forEach(c=>{
-          c.textContent='';
-          c.classList.remove('visible');
-        });
-      }
-
-      function showCrown(winner){
-        clearCrowns();
-        if(winner==='empate'){
-          crownJugador.textContent='👑';
-          crownIA.textContent='👑';
-          crownJugador.classList.add('visible');
-          crownIA.classList.add('visible');
-        } else if(winner===HUMAN){
-          crownJugador.textContent='👑';
-          crownJugador.classList.add('visible');
-        } else if(winner===AI){
-          crownIA.textContent='👑';
-          crownIA.classList.add('visible');
-        }
-      }
-
-      function evaluateBoard(state) {
-        if (checkThree(AI, state)) return -100;
-        if (checkThree(HUMAN, state)) return 100;
-
-        let score = 0;
-        for (const line of WINS) {
-          const vals = line.map(i => state[i]);
-          const aiCount = vals.filter(v => v === AI).length;
-          const humanCount = vals.filter(v => v === HUMAN).length;
-          const emptyCount = vals.filter(v => v === null).length;
-
-          if (aiCount === 2 && emptyCount === 1) score -= 10;
-          if (aiCount === 1 && emptyCount === 2) score -= 2;
-
-          if (humanCount === 2 && emptyCount === 1) score += 10;
-          if (humanCount === 1 && emptyCount === 2) score += 2;
-        }
-        return score;
-      }
-
-      function minimax(state, depth, alpha, beta, isMaximizing) {
-        if (checkThree(AI, state)) return -100 + depth;
-        if (checkThree(HUMAN, state)) return 100 - depth;
-        if (state.every(x => x !== null) || depth >= 4) {
-          return evaluateBoard(state);
-        }
-
-        if (isMaximizing) {
-          let best = -Infinity;
-          for (let i = 0; i < SIZE*SIZE; i++) {
-            if (state[i] === null) {
-              state[i] = AI;
-              const score = minimax(state, depth + 1, alpha, beta, false);
-              state[i] = null;
-              best = Math.max(best, score);
-              alpha = Math.max(alpha, best);
-              if (beta <= alpha) break;
-            }
-          }
-          return best;
-        } else {
-          let best = Infinity;
-          for (let i = 0; i < SIZE*SIZE; i++) {
-            if (state[i] === null) {
-              state[i] = HUMAN;
-              const score = minimax(state, depth + 1, alpha, beta, true);
-              state[i] = null;
-              best = Math.min(best, score);
-              beta = Math.min(beta, best);
-              if (beta <= alpha) break;
-            }
-          }
-          return best;
-        }
-      }
-
-      function aiMove(){
-        if(gameOver || currentPlayer!==AI) return;
-
-        let bestScore=-Infinity, bestMove=null;
-        for(let i=0;i<SIZE*SIZE;i++){
-          if(board[i]===null){
-            board[i]=AI;
-            if(!checkThree(AI)){
-              let score=minimax(board,0,-Infinity,Infinity,false);
-              if(score>bestScore){ bestScore=score; bestMove=i; }
-            }
-            board[i]=null;
-          }
-        }
-        if(bestMove!==null){
-          placePiece(bestMove,AI);
-        } else {
-          const fallback=board.findIndex(x=>x===null);
-          if(fallback!==-1) placePiece(fallback,AI);
-        }
-      }
-
-      resetBtn.addEventListener('click', ()=>init());
-
-      init();
-    })();
-  </script>
+})();
+</script>
 </body>
 </html>
