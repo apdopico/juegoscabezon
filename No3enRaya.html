@@ -41,6 +41,13 @@
       object-fit: contain;
       position: relative;
       z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    /* ⭐ NUEVO: resaltado de turno */
+    .turn-highlight {
+      filter: drop-shadow(0 0 8px gold) brightness(1.2);
+      transform: scale(1.15);
     }
 
     /* Copa a la derecha */
@@ -135,13 +142,27 @@
       width: 50px;
       height: 50px;
     }
+    @media (max-width: 400px) {
+      .piece-box {
+      width: 17px;
+      height: 17px;
+      }
+      .player-icon {
+      width: 35px;
+      height: 35px;
+      }
+      .player-box {
+      padding: 6px;
+      }
+}
+
   </style>
 </head>
 <body>
 
   <!-- CAJA SUPERIOR IA -->
   <div class="player-box">
-    <img src="Imagenes/IA.png" class="player-icon">
+    <img id="iconIA" src="Imagenes/IA.png" class="player-icon">
     <img id="crownIA" class="crown" src="Imagenes/iconoCopa.png">
 
     <div id="iaPieces" class="pieces-area"></div>
@@ -152,7 +173,7 @@
 
   <!-- CAJA INFERIOR JUGADOR -->
   <div class="player-box">
-    <img src="Imagenes/jugador.png" class="player-icon">
+    <img id="iconJugador" src="Imagenes/jugador.png" class="player-icon">
     <img id="crownJugador" class="crown" src="Imagenes/iconoCopa.png">
 
     <div id="jugadorPieces" class="pieces-area"></div>
@@ -186,6 +207,21 @@
   let remaining;
   let currentPlayer;
   let gameOver;
+
+  /* ⭐ NUEVA FUNCIÓN: resaltar turno */
+  function updateTurnHighlight() {
+    const iconIA = document.getElementById("iconIA");
+    const iconJugador = document.getElementById("iconJugador");
+
+    iconIA.classList.remove("turn-highlight");
+    iconJugador.classList.remove("turn-highlight");
+
+    if (currentPlayer === AI) {
+      iconIA.classList.add("turn-highlight");
+    } else {
+      iconJugador.classList.add("turn-highlight");
+    }
+  }
 
   /* --- Generar líneas ganadoras --- */
   function generateWins(){
@@ -237,6 +273,9 @@
 
     render();
     updatePieces();
+
+    /* ⭐ Resaltar turno al iniciar */
+    updateTurnHighlight();
 
     if(currentPlayer === AI){
       setTimeout(()=>aiMove(),400);
@@ -295,6 +334,9 @@
     }
 
     currentPlayer = (player===HUMAN ? AI : HUMAN);
+
+    /* ⭐ Resaltar turno después de jugar */
+    updateTurnHighlight();
   }
 
   function checkThree(player, state = board){
