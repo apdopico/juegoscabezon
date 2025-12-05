@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Real Orden - Secuencia Real</title>
+    <meta name="language" content="es">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <link rel="icon" type="image/png" href="Imagenes/faviconCabeza.png"/>
+    <style>
+        /* --- ESTILOS CSS --- */
+        body {
+            font-family: Arial, sans-serif;
+            background-color:#3d5c5c;
+            background-image: url("../Imagenes/imagenFondo.png");
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .contenedor-juego {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            background-color: antiquewhite;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        td {
+            width: 100px;
+            height: 140px;
+            padding: 5px;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+        }
+
+        td img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 5px;
+            transition: opacity 0.3s ease; 
+            cursor: pointer;
+        }
+
+        .zona-central {
+            background-color: rgb(192, 189, 189);
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .zona-central img {
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+            cursor: default;
+        }
+
+        .btn-jugar {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s;
+        }
+
+        .btn-jugar:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-jugar img {
+            max-width: 150px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor-juego">
+        
+        <table>
+            <tr>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 0)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 1)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 2)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+            </tr>
+
+            <tr>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 3)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+                
+                <td rowspan="2" class="zona-central" id="espacio-central"></td>
+                
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 4)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+            </tr>
+
+            <tr>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 5)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 6)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+            </tr>
+
+            <tr>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 7)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 8)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+                <td><img class="carta-imagen" onclick="verificarIntento(this, 9)" src="Imagenes/espadasRv.png" alt="Reverso"></td>
+            </tr>
+        </table>
+
+        <button class="btn-jugar" onclick="iniciarJuego()">
+            <img src="Imagenes/jugar5.png" alt="Boton Jugar">
+        </button>
+
+    </div>
+<script>
+    // --- CONFIGURACIÓN DE LA SECUENCIA ---
+    // Este es el orden estricto que el jugador debe seguir para ganar
+    const ordenVictoria = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
+    
+    // Generamos las rutas basadas en el orden
+    const coleccionEspadas = ordenVictoria.map(i => `Imagenes/espadas${i}v.jpg`);
+
+    // --- ESTADO DEL JUEGO ---
+    let temporizadorReset; 
+    let distribucionActual = [];
+    let esperandoSeleccion = false;
+    let juegoTerminado = false;
+    
+    // Controla qué carta toca buscar ahora (índice del array ordenVictoria)
+    let indiceObjetivoActual = 0; 
+
+    function barajarArray(array) {
+        let copia = [...array];
+        for (let i = copia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copia[i], copia[j]] = [copia[j], copia[i]];
+        }
+        return copia;
+    }
+
+    function resetearCartas() {
+        const slotsDeCartas = document.querySelectorAll('.carta-imagen');
+        
+        slotsDeCartas.forEach((imgElement) => {
+            imgElement.style.opacity = 0;
+            setTimeout(() => {
+                imgElement.src = 'Imagenes/espadasRv.png'; 
+                imgElement.alt = 'Reverso';
+                imgElement.style.opacity = 1;
+                imgElement.style.cursor = 'pointer';
+            }, 150);
+        });
+
+        esperandoSeleccion = true;
+        // Indicamos cuál es la primera carta a buscar
+        console.log(`Cartas ocultas. Busca: Espadas ${ordenVictoria[indiceObjetivoActual]}`);
+    }
+
+    function iniciarJuego() {
+        if (temporizadorReset) clearTimeout(temporizadorReset);
+        
+        // Reinicio de variables
+        esperandoSeleccion = false; 
+        juegoTerminado = false;
+        indiceObjetivoActual = 0; // Empezamos buscando la primera carta de la lista (el 1)
+        
+        document.getElementById('espacio-central').innerHTML = '';
+
+        distribucionActual = barajarArray(coleccionEspadas);
+        
+        const slotsDeCartas = document.querySelectorAll('.carta-imagen');
+
+        slotsDeCartas.forEach((imgElement, indice) => {
+            imgElement.style.cursor = 'default'; 
+            imgElement.style.opacity = 0;
+
+            setTimeout(() => {
+                imgElement.src = distribucionActual[indice];
+                const match = distribucionActual[indice].match(/espadas(\d+)v/);
+                const numeroCarta = match ? match[1] : '?';
+                imgElement.alt = `Espada ${numeroCarta}`; 
+                imgElement.style.opacity = 1;
+            }, 150); 
+        });
+
+        // Temporizador de 30 segundos
+        temporizadorReset = setTimeout(resetearCartas, 30000); 
+        console.log("Juego iniciado. Memoriza.");
+    }
+
+    /**
+     * Lógica progresiva: Debe encontrar 1, luego 2, luego 3...
+     */
+    function verificarIntento(imgElement, indice) {
+        // Validaciones básicas
+        if (!esperandoSeleccion || juegoTerminado) return;
+        
+        // Si la celda ya está vacía (opacidad 0), ignoramos el clic
+        if (imgElement.style.opacity == '0') return;
+
+        const cartaClicada = distribucionActual[indice];
+        
+        // Calculamos cuál es la carta que DEBERÍA salir ahora
+        // Ejemplo: si indiceObjetivoActual es 0, buscamos 'espadas1v'
+        const numeroBuscado = ordenVictoria[indiceObjetivoActual];
+        const stringBuscado = `espadas${numeroBuscado}v`;
+
+        // COMPROBAMOS SI ES LA CARTA CORRECTA
+        if (cartaClicada.includes(stringBuscado)) {
+            // --- ACIERTO ---
+            console.log(`¡Correcto! Encontraste el ${numeroBuscado}.`);
+
+            // 1. Vaciar la celda
+            imgElement.style.opacity = 0;
+            imgElement.style.cursor = 'default';
+
+            // 2. Actualizar el centro con la carta encontrada
+            const celdaCentral = document.getElementById('espacio-central');
+            celdaCentral.innerHTML = ''; // Limpiamos la anterior
+            
+            const imgGanadora = document.createElement('img');
+            imgGanadora.src = cartaClicada;
+            imgGanadora.alt = `Espada ${numeroBuscado}`;
+            imgGanadora.style.opacity = 0;
+            imgGanadora.style.transition = "opacity 0.5s ease";
+            
+            celdaCentral.appendChild(imgGanadora);
+            setTimeout(() => { imgGanadora.style.opacity = 1; }, 50);
+
+            // 3. Avanzar en la secuencia
+            indiceObjetivoActual++;
+
+            // 4. Comprobar si ha terminado toda la secuencia
+            if (indiceObjetivoActual >= ordenVictoria.length) {
+                console.log("¡HAS GANADO LA PARTIDA COMPLETA!");
+                juegoTerminado = true;
+            } else {
+                console.log(`Siguiente objetivo: Espadas ${ordenVictoria[indiceObjetivoActual]}`);
+            }
+
+        } else {
+            // --- FALLO ---
+            console.log(`Fallaste. Buscabas el ${numeroBuscado} pero salió: ${cartaClicada}`);
+            juegoTerminado = true; // Fin del juego
+
+            // Mostrar la carta errónea en la celda clicada
+            imgElement.style.opacity = 0;
+            setTimeout(() => {
+                imgElement.src = cartaClicada;
+                imgElement.style.opacity = 1;
+            }, 150);
+        }
+    }
+</script>
+</body>
+</html>

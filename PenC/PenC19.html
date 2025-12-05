@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
+
 <html>
 	<head>
-		<title>Palabras en cruz 18</title>
+		<title>Palabras en cruz 19</title>
         <meta name="language" content="es">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
@@ -11,8 +12,8 @@
           table{margin:auto;border-collapse:collapse;margin-top:2em;text-align:center;background-color:rgb(233,233,219);table-layout: fixed;}
           #cruz {border: 2px solid #000;width:1.5em;height:1.5em;}
           #cruz td{border:1px solid black;width:1.5em;height:1.5em;padding: 0;}
-          #escribir{border:1px solid black;width:11.3em;height:2em;line-height:1.5em;font-size:1.25em;}
-          #palabra{width:5.3em;border:1px solid black;}
+          #escribir{border:1px solid black;width:11em;height:2em;line-height:1.5em;font-size:1.25em;}
+          #palabra{width:5em;border:1px solid black;}
           #letras{border:1px solid black;}
           #letras td{border:none;width:2em;}
           #letras tr{height:2em;}
@@ -40,25 +41,25 @@
       <script>
         var palabra="";
         const palabrasMapa={
-            "GRIAL":["C6","D6","E6","F6","G6"],
-            "LIGAR":["A5","A6","A7","A8","A9"],
-            "AGIL":["A1","B1","C1","D1"],
-            "GILA":["C6","C7","C8","C9"],
-            "GIRA":["F3","F4","F5","F6"],
-            "GLIA":["B1","B2","B3","B4"],
-            "IRGA":["F8","G8","H8","I8"],
-            "LIAR":["D1","D2","D3","D4"],
-            "LIGA":["A3","B3","C3","D3"],
-            "LIRA":["G6","G7","G8","G9"],
-            "RAIL":["D4","E4","F4","G4"],
-            "RIAL":["A9","B9","C9","D9"],
-            "RILA":["I5","I6","I7","I8"],
+            "MORA":["A6","A7","A8","A9"],
+            "ZOMA":["C3","C4","C5","C6"],
+            "MAZO":["D6","D7","D8","D9"],
+            "RAMO":["E3","E4","E5","E6"],
+            "ROMA":["F6","F7","F8","F9"],
+            "ORZA":["G1","G2","G3","G4"],
+            "AZOR":["H5","H6","H7","H8"],
+            "MARZO":["C1","D1","E1","F1","G1"],
+            "ROZA":["E3","F3","G3","H3"],
+            "MOZA":["B4","C4","D4","E4"],
+            "AMOR":["C6","D6","E6","F6"],
+            "MARO":["F8","G8","H8","I8"],
+            "ARMO":["A9","B9","C9","D9"],
         }
         function escribirA(){palabra=palabra+"A";escribir();}
         function escribirR(){palabra=palabra+"R";escribir();}
-        function escribirL(){palabra=palabra+"L";escribir();}
-        function escribirI(){palabra=palabra+"I";escribir();}
-        function escribirG(){palabra=palabra+"G";escribir();}
+        function escribirZ(){palabra=palabra+"Z";escribir();}
+        function escribirO(){palabra=palabra+"O";escribir();}
+        function escribirS(){palabra=palabra+"M";escribir();}
         function escribir(){document.getElementById("palabra").innerHTML=palabra;}
         function escribirPC() {
     if (palabrasMapa[palabra]) {
@@ -129,59 +130,59 @@
     <body>
      <table id="cruz">
         <tr>
-            <td><input type="button" id="A1"></td>
-            <td><input type="button" id="B1"></td>
+            <td style="border:none"><input type="button" id="A1"></td>
+            <td style="border:none"><input type="button" id="B1"></td>
             <td><input type="button" id="C1"></td>
             <td><input type="button" id="D1"></td>
-            <td style="border:none"><input type="button" id="E1"></td>
-	        <td style="border:none"><input type="button" id="F1"></td>
-            <td style="border:none"><input type="button" id="G1"></td>
+            <td><input type="button" id="E1"></td>
+	        <td><input type="button" id="F1"></td>
+            <td><input type="button" id="G1"></td>
             <td style="border:none"><input type="button" id="H1"></td>
             <td style="border:none"><input type="button" id="I1"></td>      
         </tr>
         <tr>
-            <td style="border:none; background-color: black;"><input type="button" id="A2"></td>
-            <td><input type="button" id="B2"></td>
-            <td style="border:none; background-color: black;"><input type="button" id="C2"></td>
-            <td><input type="button" id="D2"></td>
+            <td style="border:none"><input type="button" id="A2"></td>
+            <td style="border:none"><input type="button" id="B2"></td>
+            <td style="border:none"><input type="button" id="C2"></td>
+            <td style="border:none"><input type="button" id="D2"></td>
             <td style="border:none"><input type="button" id="E2"></td>
 	        <td style="border:none"><input type="button" id="F2"></td>
-            <td style="border:none"><input type="button" id="G2"></td>
+            <td><input type="button" id="G2"></td>
             <td style="border:none"><input type="button" id="H2"></td>
             <td style="border:none"><input type="button" id="I2"></td>
         </tr>
         <tr>
-            <td><input type="button" id="A3"></td>
-            <td><input type="button" id="B3"></td>
+            <td style="border:none"><input type="button" id="A3"></td>
+            <td style="border:none"><input type="button" id="B3"></td>
             <td><input type="button" id="C3"></td>
-            <td><input type="button" id="D3"></td>
-            <td style="border:none"><input type="button" id="E3"></td>
+            <td style="border:none"><input type="button" id="D3"></td>
+            <td><input type="button" id="E3"></td>
 	        <td><input type="button" id="F3"></td>
-            <td style="border:none"><input type="button" id="G3"></td>
-            <td style="border:none"><input type="button" id="H3"></td>
+            <td><input type="button" id="G3"></td>
+            <td><input type="button" id="H3"></td>
             <td style="border:none"><input type="button" id="I3"></td>
         </tr>
         <tr>
-            <td style="border:none; background-color: black;"><input type="button" id="A4"></td>
+            <td style="border:none"><input type="button" id="A4"></td>
             <td><input type="button" id="B4"></td>
-            <td style="border:none"><input type="button" id="C4"></td>
+            <td><input type="button" id="C4"></td>
             <td><input type="button" id="D4"></td>
             <td><input type="button" id="E4"></td>
-	        <td><input type="button" id="F4"></td>
+	        <td style="border:none"><input type="button" id="F4"></td>
             <td><input type="button" id="G4"></td>
             <td style="border:none"><input type="button" id="H4"></td>
             <td style="border:none"><input type="button" id="I4"></td>
         </tr>
         <tr>
-            <td><input type="button" id="A5"></td>
+            <td style="border:none"><input type="button" id="A5"></td>
             <td style="border:none"><input type="button" id="B5"></td>
-            <td style="border:none"><input type="button" id="C5"></td>
-            <td style="border:none"><input type="button" id="D5"></td>
-            <td style="border:none"><input type="button" id="E5"></td>
-	        <td><input type="button" id="F5"></td>
+            <td><input type="button" id="C5"></td>
+            <td style="border: none; background-color: black;"><input type="button" id="D5"></td>
+            <td><input type="button" id="E5"></td>
+	        <td style="border:none"><input type="button" id="F5"></td>
             <td style="border:none"><input type="button" id="G5"></td>
-            <td style="border:none"><input type="button" id="H5"></td>
-            <td><input type="button" id="I5"></td>
+            <td><input type="button" id="H5"></td>
+            <td style="border:none"><input type="button" id="I5"></td>
         </tr>
         <tr>
             <td><input type="button" id="A6"></td>
@@ -190,26 +191,26 @@
             <td><input type="button" id="D6"></td>
             <td><input type="button" id="E6"></td>
 	        <td><input type="button" id="F6"></td>
-            <td><input type="button" id="G6"></td>
-            <td style="border:none"><input type="button" id="H6"></td>
-            <td><input type="button" id="I6"></td>
+            <td style="border:none"><input type="button" id="G6"></td>
+            <td><input type="button" id="H6"></td>
+            <td style="border:none"><input type="button" id="I6"></td>
         </tr>
         <tr>
             <td><input type="button" id="A7"></td>
             <td style="border:none"><input type="button" id="B7"></td>
-            <td><input type="button" id="C7"></td>
-            <td style="border:none"><input type="button" id="D7"></td>
+            <td style="border:none"><input type="button" id="C7"></td>
+            <td><input type="button" id="D7"></td>
             <td style="border:none"><input type="button" id="E7"></td>
-	        <td style="border:none"><input type="button" id="F7"></td>
-            <td><input type="button" id="G7"></td>
-            <td style="border:none"><input type="button" id="H7"></td>
-            <td><input type="button" id="I7"></td>
+	        <td><input type="button" id="F7"></td>
+            <td style="border:none"><input type="button" id="G7"></td>
+            <td><input type="button" id="H7"></td>
+            <td style="border:none"><input type="button" id="I7"></td>
         </tr>
         <tr>
             <td><input type="button" id="A8"></td>
             <td style="border:none"><input type="button" id="B8"></td>
-            <td><input type="button" id="C8"></td>
-            <td style="border:none"><input type="button" id="D8"></td>
+            <td style="border:none"><input type="button" id="C8"></td>
+            <td><input type="button" id="D8"></td>
             <td style="border:none"><input type="button" id="E8"></td>
 	        <td><input type="button" id="F8"></td>
             <td><input type="button" id="G8"></td>
@@ -222,8 +223,8 @@
             <td><input type="button" id="C9"></td>
             <td><input type="button" id="D9"></td>
             <td style="border:none"><input type="button" id="E9"></td>
-	        <td style="border:none"><input type="button" id="F9"></td>
-            <td><input type="button" id="G9"></td>
+	        <td><input type="button" id="F9"></td>
+            <td style="border:none"><input type="button" id="G9"></td>
             <td style="border:none"><input type="button" id="H9"></td>
             <td style="border:none"><input type="button" id="I9"></td>
         </tr>
@@ -237,9 +238,9 @@
      </table>
      <table id="letras">
         <tr>
-            <td><input type="button" value="G" onclick="escribirG()"></td>
+            <td><input type="button" value="Z" onclick="escribirZ()"></td>
             <td></td>
-            <td><input type="button" value="I" onclick="escribirI()"></td>
+            <td><input type="button" value="O" onclick="escribirO()"></td>
         </tr>
         <tr>
             <td></td>
@@ -247,7 +248,7 @@
             <td></td>
            </tr>
         <tr>
-            <td><input type="button" value="L" onclick="escribirL()"></td>
+            <td><input type="button" value="M" onclick="escribirS()"></td>
             <td></td>
             <td><input type="button" value="A" onclick="escribirA()"></td>
         </tr>
